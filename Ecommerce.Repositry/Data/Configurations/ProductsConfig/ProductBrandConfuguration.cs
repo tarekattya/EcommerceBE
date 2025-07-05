@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Ecommerce.Repositry.Data.Configurations.ProductsConfig
+namespace Ecommerce.Infrastructure.Configurations.ProductsConfig
 {
     internal class ProductBrandConfuguration : IEntityTypeConfiguration<ProductBrand>
     {

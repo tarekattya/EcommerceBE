@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.API", "Ecommerce.API\Ecommerce.API.csproj", "{449C2FF0-26C7-4DC6-B2B9-9B5414F3C3A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Core", "Ecommerce.Core\Ecommerce.Core.csproj", "{5C550887-C9A9-45D6-9EA4-66051D475A10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Repositry", "Ecommerce.Repositry\Ecommerce.Repositry.csproj", "{2BB7CDCB-1A50-4458-9CF6-B74A0AC70504}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Infrastructure", "Ecommerce.Repositry\Ecommerce.Infrastructure.csproj", "{2BB7CDCB-1A50-4458-9CF6-B74A0AC70504}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Services", "Ecommerce.Services\Ecommerce.Services.csproj", "{64E3E4B1-57F5-4BFF-9B70-5E4D56628744}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Application", "Ecommerce.Services\Ecommerce.Application.csproj", "{64E3E4B1-57F5-4BFF-9B70-5E4D56628744}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -16,5 +16,14 @@ namespace Ecommerce.API.Controllers
             var products = await _repository.GetAllAsync();
             return Ok(products);
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> GetProductById([FromRoute] int id)
+        {
+            var product = await _repository.GetByIdAsync(id);
+            
+            return product is not null ? Ok(product) : NotFound(); 
+           
+        }
     }
 }

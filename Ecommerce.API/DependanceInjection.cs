@@ -1,7 +1,7 @@
-﻿using Ecommerce.API.Data;
+﻿using Ecommerce.Infrastructure;
 using Ecommerce.Core.RepositoryContracts;
-using Ecommerce.Repositry;
 using Microsoft.EntityFrameworkCore;
+using Ecommerce.Infrastructure.Data;
 
 namespace Ecommerce.API
 {
@@ -10,7 +10,11 @@ namespace Ecommerce.API
 
         public static IServiceCollection AddApplicationServices(this IServiceCollection services , IConfiguration configuration)
         {
-          
+            services.AddControllers();
+            services.AddOpenApi();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+
             services.AddDBServices(configuration);
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             return services;

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Repositry.Data.Configurations.ProductsConfig
+namespace Ecommerce.Infrastructure.Configurations.ProductsConfig
 {
     internal class ProductConfuguration : IEntityTypeConfiguration<Product>
     {

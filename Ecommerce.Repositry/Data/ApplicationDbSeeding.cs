@@ -1,4 +1,4 @@
-﻿using Ecommerce.API.Data;
+﻿using Ecommerce.Infrastructure;
 using Ecommerce.Core.Entites;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Repositry.Data
+namespace Ecommerce.Infrastructure.Data
 {
     public static class ApplicationDbSeeding
     {

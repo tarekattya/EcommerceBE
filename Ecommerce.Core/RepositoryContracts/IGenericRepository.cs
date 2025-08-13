@@ -1,4 +1,5 @@
-﻿using Ecommerce.Core.Entites;
+﻿using Ecommerce.Core.Abstraction;
+using Ecommerce.Core.Entites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,8 @@ namespace Ecommerce.Core.RepositoryContracts
     public interface IGenericRepository<T> where T : AuditLogging
     {
 
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<T?> GetByIdAsync(int id);
+        Task<Result<IEnumerable<T>>> GetAllAsync();
+        Task<Result<T?>> GetByIdAsync(int id);
      
     }
 }

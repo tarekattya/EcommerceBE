@@ -11,9 +11,6 @@ namespace Ecommerce.Infrastructure.Configurations.ProductsConfig
             builder.Property(B => B.Name)
                .IsRequired()
                .HasMaxLength(80);
-
-
-
         }
     }
 }

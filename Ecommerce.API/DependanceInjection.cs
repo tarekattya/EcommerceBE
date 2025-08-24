@@ -1,7 +1,12 @@
-﻿using Ecommerce.Infrastructure;
+﻿using Ecommerce.API.Mapping.ProductMap;
 using Ecommerce.Core.RepositoryContracts;
-using Microsoft.EntityFrameworkCore;
+using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
+using Mapster;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Runtime.Intrinsics.Arm;
 
 namespace Ecommerce.API
 {
@@ -14,6 +19,8 @@ namespace Ecommerce.API
             services.AddOpenApi();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+            services.AddMapping(configuration);
+
 
             services.AddDBServices(configuration);
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -27,6 +34,23 @@ namespace Ecommerce.API
                 {
                     options/*.UseLazyLoadingProxies()*/.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
                 });
+            return services;
+        }
+        public static IServiceCollection AddMapping(this IServiceCollection services, IConfiguration configuration)
+        {
+
+            services.Configure<BaseUrl>(configuration.GetSection("BaseUrl"));
+
+            services.AddSingleton<IMapper>(sp =>
+            {
+                var urlOptions = sp.GetRequiredService<IOptions<BaseUrl>>();
+
+                var config = TypeAdapterConfig.GlobalSettings;
+                Config.Register(config, urlOptions);
+
+                return new Mapper(config);
+            });
+
             return services;
         }
     }

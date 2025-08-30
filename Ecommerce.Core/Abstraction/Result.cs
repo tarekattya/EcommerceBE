@@ -14,10 +14,10 @@ namespace Ecommerce.Core.Abstraction
 
         public Result(bool isSuccess , Error? error)
         {
-            if(isSuccess && error != null)
+            if (isSuccess && error != null)
                 throw new InvalidOperationException("Successful result must not have an error.");
 
-            if(!isSuccess && error != null)
+            if (!isSuccess && error == null)
                 throw new InvalidOperationException("Failed result must have an error.");
 
             this.IsSuccess = isSuccess;

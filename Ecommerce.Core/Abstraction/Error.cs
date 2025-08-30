@@ -20,5 +20,7 @@ namespace Ecommerce.Core.Abstraction
             Message = message;
             this.statusCode = statusCode;
         }
+
+
     }
 }

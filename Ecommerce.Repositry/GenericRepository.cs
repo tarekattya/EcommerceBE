@@ -55,14 +55,19 @@ namespace Ecommerce.Infrastructure
             return  Result<IEnumerable<T>>.Success(data);
 
         }
-        public async Task<Result<T?>> GetByIdWithSpecAsync(ISpecification<T> spec)
+        public async Task<Result<T>> GetByIdWithSpecAsync(ISpecification<T> spec)
         {
             var singledata = await ApplaySpecifications(spec)
                 .FirstOrDefaultAsync();
 
-            
-            return Result<T?>.Success(singledata);
+            if (singledata is null)
+                return Result<T>.Failure(
+                    new Error("NotFound", $"{typeof(T).Name} not found" , 400)
+                );
+
+            return Result<T>.Success(singledata);
         }
+
 
         private IQueryable<T> ApplaySpecifications(ISpecification<T> spec) => 
             SpecificationEvaluator<T>.GetQuery(_dbContext.Set<T>(), spec);

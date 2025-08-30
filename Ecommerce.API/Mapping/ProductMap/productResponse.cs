@@ -12,6 +12,6 @@ namespace Ecommerce.API.Mapping.ProductMap
         int CategoryId,
         string Category
         );
-
+    ///
 
 }

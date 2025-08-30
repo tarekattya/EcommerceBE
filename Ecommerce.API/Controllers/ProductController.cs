@@ -23,7 +23,7 @@ namespace Ecommerce.API.Controllers
             var result = await _repository.GetAllWithSpecAsync(spec);
 
             if (!result.IsSuccess)
-                return BadRequest();
+                return BadRequest(ProductErrors.NotFoundProduct);
 
             var response = result.Value.Adapt<IEnumerable<productResponse>>();
             return Ok(response);
@@ -37,7 +37,7 @@ namespace Ecommerce.API.Controllers
 
             var result = await _repository.GetByIdWithSpecAsync(Spec);
             
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(); 
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(ProductErrors.NotFoundProduct); 
            
         }
     }

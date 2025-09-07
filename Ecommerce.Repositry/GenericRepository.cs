@@ -51,6 +51,10 @@ namespace Ecommerce.Infrastructure
             var data = await ApplaySpecifications(spec)
                 .AsNoTracking()
                 .ToListAsync();
+            if (data is null || !data.Any())
+                return Result<IEnumerable<T>>.Failure(
+                    new Error("NotFound", $"{typeof(T).Name} not found", 404)
+                );
 
             return  Result<IEnumerable<T>>.Success(data);
 
@@ -62,7 +66,7 @@ namespace Ecommerce.Infrastructure
 
             if (singledata is null)
                 return Result<T>.Failure(
-                    new Error("NotFound", $"{typeof(T).Name} not found" , 400)
+                    new Error("NotFound", $"{typeof(T).Name} not found", 404)
                 );
 
             return Result<T>.Success(singledata);

@@ -1,4 +1,5 @@
 
+using Ecommerce.API.MiddleWares;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +15,8 @@ namespace Ecommerce.API
 
             // Add services to the container.
 
-            builder.Services.AddApplicationServices(builder.Configuration);
+            builder.Services.AddApplicationServices(builder.Configuration , builder);
+
 
 
             var app = builder.Build();
@@ -22,6 +24,7 @@ namespace Ecommerce.API
             await DbInitializer.InitializeAsync(app);
 
 
+            app.UseExceptionMiddleware();
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
@@ -31,7 +34,7 @@ namespace Ecommerce.API
                     op.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 });
             }
-
+            app.UseStatusCodePagesWithReExecute("/Errors/{0}");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

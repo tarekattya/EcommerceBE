@@ -12,20 +12,31 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ecommerce.API.Controllers
 {
 
-    public class ProductController(IGenericRepository<Product> repository) : ApiBaseController
+    public class ProductController(
+        
+        IGenericRepository<Product> Productrepository,
+                IGenericRepository<ProductBrand> Brandrepository,
+                IGenericRepository<ProductCategory> Caterepository
+
+
+
+
+        ) : ApiBaseController
     {
-        private readonly IGenericRepository<Product> _repository = repository;
+        private readonly IGenericRepository<Product> _repository = Productrepository;
+        private readonly IGenericRepository<ProductBrand> _brandrepository = Brandrepository;
+        private readonly IGenericRepository<ProductCategory> _caterepository = Caterepository;
 
         [HttpGet("")]
-        public async Task<ActionResult<IEnumerable<productResponse>>> GetAllProducts()
+        public async Task<ActionResult<IReadOnlyList<productResponse>>> GetAllProducts(string? sort , int? brandId , int? categoryId  )
         {
-            var spec = new ProductSpecWithBrandAndCategory();
+            var spec = new ProductSpecWithBrandAndCategory(sort , brandId , categoryId);
             var result = await _repository.GetAllWithSpecAsync(spec);
 
             if (!result.IsSuccess)
-                return NotFound(ProductErrors.NotFoundProduct);
+                return NotFound(ProductErrors.InValidInputs);
 
-            var response = result.Value.Adapt<IEnumerable<productResponse>>();
+            var response = result.Value.Adapt<IReadOnlyList<productResponse>>();
             return Ok(response);
         }
 
@@ -42,5 +53,22 @@ namespace Ecommerce.API.Controllers
 
            
         }
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<ProductBrand>> GetBrands()
+        {
+            var brands = await _brandrepository.GetAllAsync();
+            return brands.IsSuccess ? Ok(brands.Value) : NotFound(ProductErrors.NotFoundBrand);
+
+        }
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<ProductCategory>> GetCategories()
+        {
+            var brands = await _caterepository.GetAllAsync();
+            return brands.IsSuccess ? Ok(brands.Value) : NotFound(ProductErrors.NotFoundCate);
+
+        }
+
     }
 }

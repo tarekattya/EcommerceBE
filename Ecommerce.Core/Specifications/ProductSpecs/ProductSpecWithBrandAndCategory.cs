@@ -11,21 +11,50 @@ namespace Ecommerce.Core.Specifications.ProductSpecs
     {
 
 
-        public ProductSpecWithBrandAndCategory() : base()
+        public ProductSpecWithBrandAndCategory(string? sort, int? brandId, int? categoryId) : base(
+            p => (!brandId.HasValue || p.BrandId == brandId) &&
+            (!categoryId.HasValue || p.CategoryId == categoryId))
+        {
+            AddIncludes();
+
+            if (!string.IsNullOrEmpty(sort))
+            {
+                switch (sort)
+                {
+
+                    case "PriceAsc":
+                        AddOrderBy(p => p.Price);
+                        break;
+                    case "PriceDesc":
+                        AddOrderByDesc(p => p.Price);
+                        break;
+                    default:
+                        AddOrderBy(p => p.Name); break;
+
+
+                }
+            }
+            else 
+                AddOrderBy(p => p.Name);
+        }
+
+
+
+
+
+        public ProductSpecWithBrandAndCategory(int id) : base(p => p.Id == id)
         {
             AddIncludes();
         }
 
 
-        public ProductSpecWithBrandAndCategory(int id) : base(p=>p.Id == id)
-        {
-            AddIncludes();
-        }
         private void AddIncludes()
         {
             Includes.Add(p => p.Brand);
             Includes.Add(p => p.Category);
         }
+
+
 
 
 

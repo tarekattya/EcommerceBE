@@ -17,7 +17,7 @@ namespace Ecommerce.Infrastructure
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
 
-        public async Task<Result<IEnumerable<T>>> GetAllAsync()
+        public async Task<Result<IReadOnlyList<T>>> GetAllAsync()
         {
             if (typeof(T) == typeof(Product))
             {
@@ -26,10 +26,10 @@ namespace Ecommerce.Infrastructure
                     .Include(p => p.Category)
                     .AsNoTracking()
                     .ToListAsync();
-                return Result<IEnumerable<T>>.Success(products.Cast<T>());
+              return Result<IReadOnlyList<T>>.Success(products.Cast<T>().ToList());
             }
             var data = await _dbContext.Set<T>().AsNoTracking().ToListAsync();
-            return Result<IEnumerable<T>>.Success(data);
+            return Result<IReadOnlyList<T>>.Success(data);
         }
 
 
@@ -46,17 +46,17 @@ namespace Ecommerce.Infrastructure
             }
             return await _dbContext.Set<T>().FindAsync(id);
         }
-        public async Task<Result<IEnumerable<T>>> GetAllWithSpecAsync(ISpecification<T> spec)
+        public async Task<Result<IReadOnlyList<T>>> GetAllWithSpecAsync(ISpecification<T> spec)
         {
             var data = await ApplaySpecifications(spec)
                 .AsNoTracking()
                 .ToListAsync();
             if (data is null || !data.Any())
-                return Result<IEnumerable<T>>.Failure(
+                return Result<IReadOnlyList<T>>.Failure(
                     new Error("NotFound", $"{typeof(T).Name} not found", 404)
                 );
 
-            return  Result<IEnumerable<T>>.Success(data);
+            return  Result<IReadOnlyList<T>>.Success(data);
 
         }
         public async Task<Result<T>> GetByIdWithSpecAsync(ISpecification<T> spec)
@@ -76,7 +76,6 @@ namespace Ecommerce.Infrastructure
         private IQueryable<T> ApplaySpecifications(ISpecification<T> spec) => 
             SpecificationEvaluator<T>.GetQuery(_dbContext.Set<T>(), spec);
 
-
-
+       
     }
 }

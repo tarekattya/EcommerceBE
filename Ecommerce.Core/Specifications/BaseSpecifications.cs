@@ -12,7 +12,8 @@ namespace Ecommerce.Core.Specifications
     {
         public Expression<Func<T, bool>>? Criteria { get; set; } = null;
         public List<Expression<Func<T, object>>> Includes { get; set; } = new List<Expression<Func<T, object>>>();
-
+        public Expression<Func<T, object>>? OrderBy { get; set; }
+        public Expression<Func<T, object>>? OrderByDesc { get; set; }
 
         public BaseSpecifications()
         {
@@ -21,5 +22,16 @@ namespace Ecommerce.Core.Specifications
         {
             Criteria = cirteria;
         }
+
+
+        public void AddOrderBy(Expression<Func<T , object>> OrderByExp)
+        {
+            OrderBy = OrderByExp;
+        }
+        public void AddOrderByDesc(Expression<Func<T, object>> OrderByDescExp)
+        {
+            OrderByDesc = OrderByDescExp;
+        }
+
     }
 }

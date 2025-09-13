@@ -7,6 +7,7 @@ namespace Ecommerce.API.Mapping.ProductMap
         string Name,
        string Description,
        string PictureUrl,
+       decimal Price,
         int BrandId,
         string Brand,
         int CategoryId,

@@ -20,6 +20,12 @@ namespace Ecommerce.Infrastructure
             {
                 query = query.Where(spec.Criteria);
             }
+
+            if(spec.OrderBy != null)
+                query = query.OrderBy(spec.OrderBy);
+            else if(spec.OrderByDesc != null)
+                query = query.OrderByDescending(spec.OrderByDesc);
+
             if (spec.Includes != null && spec.Includes.Any())
             {
                 query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));

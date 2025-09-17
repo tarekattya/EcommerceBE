@@ -1,4 +1,5 @@
-﻿using Ecommerce.API.Mapping.ProductMap;
+﻿using Ecommerce.API.Helper;
+using Ecommerce.API.Mapping.ProductMap;
 using Ecommerce.Core.Abstraction.Errors;
 using Ecommerce.Core.Entites;
 using Ecommerce.Core.RepositoryContracts;
@@ -28,16 +29,21 @@ namespace Ecommerce.API.Controllers
         private readonly IGenericRepository<ProductCategory> _caterepository = Caterepository;
 
         [HttpGet("")]
-        public async Task<ActionResult<IReadOnlyList<productResponse>>> GetAllProducts(string? sort , int? brandId , int? categoryId  )
+        public async Task<ActionResult<Pagination<productResponse>>> GetAllProducts([FromQuery] ProductSpecParams specParams)
         {
-            var spec = new ProductSpecWithBrandAndCategory(sort , brandId , categoryId);
+            var spec = new ProductSpecWithBrandAndCategory(specParams);
             var result = await _repository.GetAllWithSpecAsync(spec);
 
             if (!result.IsSuccess)
                 return NotFound(ProductErrors.InValidInputs);
+            var Forcount = new ProductWithSpecificationFilterionForCount(specParams);
+            var count = await _repository.GetCountAsync(Forcount);
+
+
+
 
             var response = result.Value.Adapt<IReadOnlyList<productResponse>>();
-            return Ok(response);
+            return Ok(new Pagination<productResponse>(specParams.pageIndex , specParams.pageIndex, count , response));
         }
 
 

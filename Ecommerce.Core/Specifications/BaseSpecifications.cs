@@ -14,6 +14,9 @@ namespace Ecommerce.Core.Specifications
         public List<Expression<Func<T, object>>> Includes { get; set; } = new List<Expression<Func<T, object>>>();
         public Expression<Func<T, object>>? OrderBy { get; set; }
         public Expression<Func<T, object>>? OrderByDesc { get; set; }
+        public int Skip { get; set; }
+        public int Take { get; set; }
+        public bool IsEnablerPagination { get; set; }
 
         public BaseSpecifications()
         {
@@ -31,6 +34,13 @@ namespace Ecommerce.Core.Specifications
         public void AddOrderByDesc(Expression<Func<T, object>> OrderByDescExp)
         {
             OrderByDesc = OrderByDescExp;
+        }
+
+        public void ApplyPagination(int skip, int take)
+        {
+            IsEnablerPagination = true;
+            Skip = skip;
+            Take = take;
         }
 
     }

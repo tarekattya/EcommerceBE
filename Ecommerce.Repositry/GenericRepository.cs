@@ -71,11 +71,14 @@ namespace Ecommerce.Infrastructure
 
             return Result<T>.Success(singledata);
         }
+        public async Task<int> GetCountAsync(ISpecification<T> spec)
+        {
+            return await ApplaySpecifications(spec).CountAsync();
+        }
 
 
         private IQueryable<T> ApplaySpecifications(ISpecification<T> spec) => 
             SpecificationEvaluator<T>.GetQuery(_dbContext.Set<T>(), spec);
 
-       
     }
 }

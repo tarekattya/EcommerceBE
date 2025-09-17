@@ -11,15 +11,18 @@ namespace Ecommerce.Core.Specifications.ProductSpecs
     {
 
 
-        public ProductSpecWithBrandAndCategory(string? sort, int? brandId, int? categoryId) : base(
-            p => (!brandId.HasValue || p.BrandId == brandId) &&
-            (!categoryId.HasValue || p.CategoryId == categoryId))
+        public ProductSpecWithBrandAndCategory(ProductSpecParams specParams) : base(
+
+            p =>
+           (string.IsNullOrEmpty(specParams.Search) || p.Name.ToLower().Contains(specParams.Search)) &&
+            (!specParams.BrandId.HasValue || p.BrandId == specParams.BrandId) &&
+            (!specParams.CategoryId.HasValue || p.CategoryId == specParams.CategoryId))
         {
             AddIncludes();
 
-            if (!string.IsNullOrEmpty(sort))
+            if (!string.IsNullOrEmpty(specParams.Sort))
             {
-                switch (sort)
+                switch (specParams.Sort)
                 {
 
                     case "PriceAsc":
@@ -36,6 +39,9 @@ namespace Ecommerce.Core.Specifications.ProductSpecs
             }
             else 
                 AddOrderBy(p => p.Name);
+
+            if(IsEnablerPagination)
+                  ApplyPagination((specParams.pageIndex - 1) * specParams.PageSize, specParams.PageSize);
         }
 
 

@@ -21,10 +21,15 @@ namespace Ecommerce.Infrastructure
                 query = query.Where(spec.Criteria);
             }
 
+
+
             if(spec.OrderBy != null)
                 query = query.OrderBy(spec.OrderBy);
             else if(spec.OrderByDesc != null)
                 query = query.OrderByDescending(spec.OrderByDesc);
+
+            if(spec.IsEnablerPagination)
+                query = query.Skip(spec.Skip).Take(spec.Take);
 
             if (spec.Includes != null && spec.Includes.Any())
             {

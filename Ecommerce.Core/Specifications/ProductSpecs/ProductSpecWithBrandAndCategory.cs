@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Core.Entites;
+using Ecommerce.Core.Entites.ProductModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,8 +41,7 @@ namespace Ecommerce.Core.Specifications.ProductSpecs
             else 
                 AddOrderBy(p => p.Name);
 
-            if(IsEnablerPagination)
-                  ApplyPagination((specParams.pageIndex - 1) * specParams.PageSize, specParams.PageSize);
+            ApplyPagination((specParams.pageIndex - 1) * specParams.PageSize, specParams.PageSize);
         }
 
 

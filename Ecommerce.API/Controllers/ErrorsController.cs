@@ -1,4 +1,4 @@
-﻿using Ecommerce.Core.Abstraction;
+﻿using Ecommerce.Shared.Abstraction;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

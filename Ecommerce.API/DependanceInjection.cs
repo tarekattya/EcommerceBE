@@ -1,13 +1,18 @@
 ﻿using Ecommerce.API.Mapping.ProductMap;
-using Ecommerce.Core.Abstraction;
+using Ecommerce.Application.Helper.Dtos.Product;
+using Ecommerce.Application.Services.Service.Contarct;
+using Ecommerce.Application.Services.Service.Implement;
 using Ecommerce.Core.RepositoryContracts;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
+using Ecommerce.Shared.Abstraction;
+using FluentValidation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using System.Runtime.Intrinsics.Arm;
 
 namespace Ecommerce.API
@@ -24,10 +29,14 @@ namespace Ecommerce.API
             services.AddSwaggerGen();
             services.AddMapping(configuration);
             services.AddValidtionResponse(webApplication);
+            services.AddFluentValidation();
 
 
             services.AddDBServices(configuration);
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICartService, CartService>();
             return services;
         }
 
@@ -38,6 +47,12 @@ namespace Ecommerce.API
                 {
                     options/*.UseLazyLoadingProxies()*/.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
                 });
+
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                
+                return ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")!);
+            });
             return services;
         }
         public static IServiceCollection AddMapping(this IServiceCollection services, IConfiguration configuration)
@@ -57,6 +72,15 @@ namespace Ecommerce.API
 
             return services;
         }
+
+        public static IServiceCollection AddFluentValidation(this IServiceCollection services)
+        {
+
+            services.AddValidatorsFromAssembly(typeof(productResponse).Assembly);
+
+            return services;
+        }
+
 
         public static IServiceCollection AddValidtionResponse(this IServiceCollection services , WebApplicationBuilder webApplication)
         {

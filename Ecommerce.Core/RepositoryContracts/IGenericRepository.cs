@@ -1,6 +1,6 @@
-﻿using Ecommerce.Core.Abstraction;
-using Ecommerce.Core.Entites;
+﻿using Ecommerce.Core.Entites;
 using Ecommerce.Core.Specifications;
+using Ecommerce.Shared.Abstraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +12,11 @@ namespace Ecommerce.Core.RepositoryContracts
     public interface IGenericRepository<T> where T : AuditLogging
     {
 
-        Task<Result<IReadOnlyList<T>>> GetAllAsync();
+        Task<IReadOnlyList<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);
 
-        Task<Result<IReadOnlyList<T>>> GetAllWithSpecAsync(ISpecification<T> spec);
-        Task<Result<T?>> GetByIdWithSpecAsync(ISpecification<T> spec);
+        Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
+        Task<T?> GetByIdWithSpecAsync(ISpecification<T> spec);
 
         Task<int> GetCountAsync(ISpecification<T> spec);
 

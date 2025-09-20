@@ -1,69 +1,39 @@
-﻿using Ecommerce.API.Helper;
-using Ecommerce.API.Mapping.ProductMap;
-using Ecommerce.Core.Abstraction.Errors;
+﻿using Ecommerce.API.Mapping.ProductMap;
+using Ecommerce.Application.Helper;
+using Ecommerce.Application.Helper.Dtos.Product;
+using Ecommerce.Application.Services.Service.Contarct;
 using Ecommerce.Core.Entites;
-using Ecommerce.Core.RepositoryContracts;
+using Ecommerce.Core.Entites.ProductModule;
 using Ecommerce.Core.Specifications.ProductSpecs;
-using Mapster;
-using MapsterMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Ecommerce.Shared.Abstraction.Errors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers
 {
 
-    public class ProductController(
-        
-        IGenericRepository<Product> Productrepository,
-                IGenericRepository<ProductBrand> Brandrepository,
-                IGenericRepository<ProductCategory> Caterepository
-
-
-
-
-        ) : ApiBaseController
+    public class ProductController(IProductService service) : ApiBaseController
     {
-        private readonly IGenericRepository<Product> _repository = Productrepository;
-        private readonly IGenericRepository<ProductBrand> _brandrepository = Brandrepository;
-        private readonly IGenericRepository<ProductCategory> _caterepository = Caterepository;
+        private readonly IProductService _service = service;
 
         [HttpGet("")]
         public async Task<ActionResult<Pagination<productResponse>>> GetAllProducts([FromQuery] ProductSpecParams specParams)
         {
-            var spec = new ProductSpecWithBrandAndCategory(specParams);
-            var result = await _repository.GetAllWithSpecAsync(spec);
-
-            if (!result.IsSuccess)
-                return NotFound(ProductErrors.InValidInputs);
-            var Forcount = new ProductWithSpecificationFilterionForCount(specParams);
-            var count = await _repository.GetCountAsync(Forcount);
-
-
-
-
-            var response = result.Value.Adapt<IReadOnlyList<productResponse>>();
-            return Ok(new Pagination<productResponse>(specParams.pageIndex , specParams.pageIndex, count , response));
+            var response = await _service.GetAllAsync(specParams);
+            return response.IsSuccess ? Ok(response.Value) : NotFound(ProductErrors.InValidInputs);
         }
 
 
         [HttpGet("{id}")]
         public async Task<ActionResult<productResponse>> GetProductById([FromRoute] int id)
         {
-            var Spec = new ProductSpecWithBrandAndCategory(id);
-
-            var result = await _repository.GetByIdWithSpecAsync(Spec);
-
-            var product = result.Value.Adapt<productResponse>();
-            return product is not null ? Ok(product) : NotFound(ProductErrors.NotFoundProduct);
-
-           
+            var response = await _service.GetProductById(id);
+            return response.IsSuccess ? Ok(response.Value) : NotFound(ProductErrors.NotFoundProduct);
         }
 
         [HttpGet("brands")]
         public async Task<ActionResult<ProductBrand>> GetBrands()
         {
-            var brands = await _brandrepository.GetAllAsync();
+            var brands = await _service.GetBrands();
             return brands.IsSuccess ? Ok(brands.Value) : NotFound(ProductErrors.NotFoundBrand);
 
         }
@@ -71,7 +41,7 @@ namespace Ecommerce.API.Controllers
         [HttpGet("categories")]
         public async Task<ActionResult<ProductCategory>> GetCategories()
         {
-            var brands = await _caterepository.GetAllAsync();
+            var brands = await _service.GetCategories();
             return brands.IsSuccess ? Ok(brands.Value) : NotFound(ProductErrors.NotFoundCate);
 
         }

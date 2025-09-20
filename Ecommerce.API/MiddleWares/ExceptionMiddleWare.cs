@@ -1,4 +1,4 @@
-﻿using Ecommerce.Core.Abstraction.Errors;
+﻿using Ecommerce.Shared.Abstraction.Errors;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 
@@ -34,8 +34,8 @@ namespace Ecommerce.API.MiddleWares
                 httpContext.Response.ContentType = "application/json";
 
                 var response = _environment.IsDevelopment()
-                    ? new ApiExceptionError(ex.Message, ex.StackTrace, statusCode, errorId)
-                    : new ApiExceptionError("An unexpected error occurred.", null, statusCode, errorId);
+                    ? new ApiExceptionError(ex.Message, ex.StackTrace!, statusCode, errorId)
+                    : new ApiExceptionError("An unexpected error occurred.", null!, statusCode, errorId);
 
                 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
                 var json = JsonSerializer.Serialize(response, options);

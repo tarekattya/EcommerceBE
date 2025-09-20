@@ -1,6 +1,4 @@
-﻿using Ecommerce.Core.Entites;
-
-namespace Ecommerce.API.Mapping.ProductMap
+﻿namespace Ecommerce.Application.Helper.Dtos.Product
 {
     public record productResponse(
         int id,

@@ -1,4 +1,4 @@
-﻿using Ecommerce.Core.Entites;
+﻿using Ecommerce.Core.Entites.ProductModule;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

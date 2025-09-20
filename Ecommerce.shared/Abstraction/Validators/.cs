@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Core.Entites
+namespace Ecommerce.shared.Abstraction.Validators
 {
-    public class ProductCategory : AuditLogging
+    internal class _
     {
-        public string Name { get; set; } = default!;
     }
 }

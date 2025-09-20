@@ -1,6 +1,4 @@
-﻿
-
-namespace Ecommerce.Core.Entites
+﻿namespace Ecommerce.Core.Entites.ProductModule
 {
     public class ProductBrand : AuditLogging
     {

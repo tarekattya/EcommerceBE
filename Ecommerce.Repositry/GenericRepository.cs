@@ -1,9 +1,9 @@
-﻿using Ecommerce.Core.Abstraction;
-using Ecommerce.Core.Abstraction.Errors;
+﻿
 using Ecommerce.Core.Entites;
 using Ecommerce.Core.RepositoryContracts;
 using Ecommerce.Core.Specifications;
 using  Ecommerce.Infrastructure.Data;
+using Ecommerce.Shared.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,59 +17,36 @@ namespace Ecommerce.Infrastructure
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
 
-        public async Task<Result<IReadOnlyList<T>>> GetAllAsync()
+        public async Task<IReadOnlyList<T>> GetAllAsync()
         {
-            if (typeof(T) == typeof(Product))
-            {
-                var products = await _dbContext.Set<Product>()
-                    .Include(p => p.Brand)
-                    .Include(p => p.Category)
-                    .AsNoTracking()
-                    .ToListAsync();
-              return Result<IReadOnlyList<T>>.Success(products.Cast<T>().ToList());
-            }
-            var data = await _dbContext.Set<T>().AsNoTracking().ToListAsync();
-            return Result<IReadOnlyList<T>>.Success(data);
+            return await _dbContext.Set<T>().AsNoTracking().ToListAsync();
         }
-
 
         public async Task<T?> GetByIdAsync(int id)
         {
-            if (typeof(T) == typeof(Product))
-            {
-                return await _dbContext.Set<Product>()
-                    .Include(p => p.Brand)
-                    .Include(p => p.Category)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.Id == id) as T;
-
-            }
             return await _dbContext.Set<T>().FindAsync(id);
         }
-        public async Task<Result<IReadOnlyList<T>>> GetAllWithSpecAsync(ISpecification<T> spec)
+        public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec)
         {
             var data = await ApplaySpecifications(spec)
                 .AsNoTracking()
                 .ToListAsync();
             if (data is null || !data.Any())
-                return Result<IReadOnlyList<T>>.Failure(
-                    new Error("NotFound", $"{typeof(T).Name} not found", 404)
-                );
+                return null!;
 
-            return  Result<IReadOnlyList<T>>.Success(data);
+            
+            return data;
 
         }
-        public async Task<Result<T>> GetByIdWithSpecAsync(ISpecification<T> spec)
+        public async Task<T?> GetByIdWithSpecAsync(ISpecification<T> spec)
         {
             var singledata = await ApplaySpecifications(spec)
                 .FirstOrDefaultAsync();
-
             if (singledata is null)
-                return Result<T>.Failure(
-                    new Error("NotFound", $"{typeof(T).Name} not found", 404)
-                );
+                return null!;
+            return singledata;
 
-            return Result<T>.Success(singledata);
+
         }
         public async Task<int> GetCountAsync(ISpecification<T> spec)
         {
@@ -80,5 +57,7 @@ namespace Ecommerce.Infrastructure
         private IQueryable<T> ApplaySpecifications(ISpecification<T> spec) => 
             SpecificationEvaluator<T>.GetQuery(_dbContext.Set<T>(), spec);
 
+        
+        
     }
 }

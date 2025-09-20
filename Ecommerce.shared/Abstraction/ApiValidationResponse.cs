@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Core.Abstraction
+namespace Ecommerce.Shared.Abstraction
 {
     public class ApiValidationResponse : Error
     {

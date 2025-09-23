@@ -1,11 +1,4 @@
-﻿using Ecommerce.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Ecommerce.Core.Entites.ProductModule;
+﻿using System.Text.Json;
 
 namespace Ecommerce.Infrastructure.Data
 {

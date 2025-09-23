@@ -1,12 +1,13 @@
 ﻿using Ecommerce.API.Mapping.ProductMap;
-using Ecommerce.Application.Helper.Dtos.Product;
 using Ecommerce.Application.Services.Service.Contarct;
 using Ecommerce.Application.Services.Service.Implement;
 using Ecommerce.Core.Entites.Identity;
 using Ecommerce.Core.RepositoryContracts;
+using Ecommerce.Core.Services.Service.Contarct;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Shared.Abstraction;
+using Ecommerce.Shared.Helper.Dtos.Product;
 using FluentValidation;
 using Mapster;
 using MapsterMapper;
@@ -40,7 +41,7 @@ namespace Ecommerce.API
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IBrandService, BrandService>();
-            services.AddScoped<ICateGoryService, CateGoryService>();
+            services.AddScoped<ICategoryService, CategoryService>();
 
             services.AddScoped<ICartService, CartService>();
             return services;

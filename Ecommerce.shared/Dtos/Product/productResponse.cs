@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Application.Helper.Dtos.Product
+﻿namespace Ecommerce.Shared.Helper.Dtos.Product
 {
     public record productResponse(
         int id,

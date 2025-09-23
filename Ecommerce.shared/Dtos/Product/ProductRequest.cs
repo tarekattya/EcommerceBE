@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ecommerce.Application.Helper.Dtos.Product
+﻿
+namespace Ecommerce.Shared.Helper.Dtos.Product
 {
     public record ProductRequest(string Name,
        string Description,

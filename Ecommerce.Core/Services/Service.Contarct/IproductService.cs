@@ -1,6 +1,4 @@
-﻿using Ecommerce.API.Mapping.ProductMap;
-using Ecommerce.Application.Helper;
-using Ecommerce.Application.Helper.Dtos.Product;
+﻿using Ecommerce.Shared.Helper.Dtos.Product;
 using Ecommerce.Core.Entites;
 using Ecommerce.Core.Entites.ProductModule;
 using Ecommerce.Core.Specifications.ProductSpecs;
@@ -10,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ecommerce.Shared.Helper;
 
 
 namespace Ecommerce.Application.Services.Service.Contarct
@@ -25,7 +24,7 @@ namespace Ecommerce.Application.Services.Service.Contarct
 
         public Task<Result<productResponse>> UpdateProduct(int id, ProductRequest request);
 
-        public Task<Result<bool>> DeleteProduct(int id);
+        public Task<Result> DeleteProduct(int id);
 
     }
 }

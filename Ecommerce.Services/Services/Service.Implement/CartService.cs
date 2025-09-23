@@ -1,15 +1,7 @@
-﻿using Ecommerce.Application.Helper.Dtos.Cart;
-using Ecommerce.Application.Services.Service.Contarct;
-using Ecommerce.Core.Entites;
-using Ecommerce.Core.RepositoryContracts;
-using Ecommerce.shared.Abstraction.Errors.Cart;
-using Ecommerce.Shared.Abstraction;
-using Mapster;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+
+using Ecommerce.Core.Services.Service.Contarct;
+using Ecommerce.Shared.Helper.Dtos.Cart;
 
 namespace Ecommerce.Application.Services.Service.Implement
 {
@@ -30,9 +22,10 @@ namespace Ecommerce.Application.Services.Service.Implement
 
         }
 
-        public async Task<bool> DeleteAsync(string key)
+        public async Task<Result> DeleteAsync(string key)
         {
-           return  await _cartRepository.DeleteCart(key);
+           var result = await _cartRepository.DeleteCart(key);
+              return result ? Result.Success() : Result.Failure(CartErrors.NotFoundCart);
         }
 
         public async Task<Result<CartRequest>> GetCartAsync(string key)

@@ -1,10 +1,6 @@
-﻿using Ecommerce.Application.Helper.Dtos.Cart;
+﻿using Ecommerce.Shared.Helper.Dtos.Cart;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Ecommerce.Application.Validators
 {

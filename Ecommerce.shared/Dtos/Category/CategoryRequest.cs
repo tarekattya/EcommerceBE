@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Helper.Dtos.Cart
+namespace Ecommerce.Shared.Helper.Dtos.Category
 {
-    public record CartRequest(string Id , ICollection<CartItemsRequest> Items);
+    public record CategoryRequest(string Name);
     
     
 }

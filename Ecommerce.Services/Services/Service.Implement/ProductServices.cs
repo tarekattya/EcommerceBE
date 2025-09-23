@@ -1,19 +1,7 @@
-﻿using Ecommerce.API.Mapping.ProductMap;
-using Ecommerce.Application.Helper;
-using Ecommerce.Application.Helper.Dtos.Product;
-using Ecommerce.Application.Services.Service.Contarct;
-using Ecommerce.Core.Entites;
-using Ecommerce.Core.Entites.ProductModule;
-using Ecommerce.Core.RepositoryContracts;
+﻿
 using Ecommerce.Core.Specifications.ProductSpecs;
-using Ecommerce.Shared.Abstraction;
-using Ecommerce.Shared.Abstraction.Errors;
-using Mapster;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ecommerce.Shared.Helper;
+using Ecommerce.Shared.Helper.Dtos.Product;
 
 namespace Ecommerce.Application.Services.Service.Implement
 {
@@ -57,6 +45,9 @@ namespace Ecommerce.Application.Services.Service.Implement
         }
         public async Task<Result<productResponse>> CreateProduct(ProductRequest product)
         {
+            var exists = await _Prepository.GetCountAsync(new ProductsByNameSpec(product.Name));
+            if (exists > 0)
+                return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
             var category = await _categoryRepo.GetByIdAsync(product.CategoryId);
             if (category is null)
                 return Result<productResponse>.Failure(ProductErrors.NotFoundCate);
@@ -73,18 +64,15 @@ namespace Ecommerce.Application.Services.Service.Implement
 
             return Result<productResponse>.Success(result.Value);
 
-
-
-
-
         }
 
         public async Task<Result<productResponse>> UpdateProduct(int id, ProductRequest request)
         {
+            var exists = await _Prepository.GetCountAsync(new ProductsByNameSpec(request.Name));
+            if (exists > 0)
+                return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
             var Spec = new ProductSpecWithBrandAndCategory(id);
-
             var product = await _Prepository.GetByIdWithSpecAsync(Spec);
-
             product.Name = request.Name;
             product.Price = request.Price;
             product.BrandId = request.BrandId;
@@ -96,7 +84,7 @@ namespace Ecommerce.Application.Services.Service.Implement
             return Result<productResponse>.Success(result.Value);
 
         }
-        public async Task<Result<bool>> DeleteProduct(int id)
+        public async Task<Result> DeleteProduct(int id)
         {
             var Spec = new ProductSpecWithBrandAndCategory(id);
 
@@ -106,7 +94,7 @@ namespace Ecommerce.Application.Services.Service.Implement
                 return Result<bool>.Failure(ProductErrors.NotFoundProduct);
 
             await _Prepository.DeleteAsync(result);
-            return Result<bool>.Success(true);
+            return Result.Success();
         }
     }
 }

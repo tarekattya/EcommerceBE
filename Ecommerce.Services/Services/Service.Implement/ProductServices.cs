@@ -27,42 +27,7 @@ namespace Ecommerce.Application.Services.Service.Implement
         private readonly IGenericRepository<ProductCategory> _categoryRepo = categoryRepo;
         private readonly IGenericRepository<ProductBrand> _brandRepo = brandRepo;
 
-        public async Task<Result<productResponse>> CreateProduct(ProductRequest product)
-        {
-            var category = await _categoryRepo.GetByIdAsync(product.CategoryId);
-            if (category is null)
-                return Result<productResponse>.Failure(ProductErrors.NotFoundCate);
 
-            var brand = await _brandRepo.GetByIdAsync(product.BrandId);
-            if (brand is null)
-                return Result<productResponse>.Failure(ProductErrors.NotFoundBrand);
-
-            var newProduct = product.Adapt<Product>();
-            var createdProduct = await _Prepository.AddAsync(newProduct);
-
-
-           var result = await GetProductById(createdProduct.Id);
-
-            return Result<productResponse>.Success(result.Value);
-
-
-
-
-
-        }
-
-        public async Task<Result<bool>> DeleteProduct(int id)
-        {
-            var Spec = new ProductSpecWithBrandAndCategory(id);
-
-            var result = await _Prepository.GetByIdWithSpecAsync(Spec);
-
-            if(result is null)
-                return Result<bool>.Failure(ProductErrors.NotFoundProduct);
-
-            await _Prepository.DeleteAsync(result);
-            return Result<bool>.Success(true);
-        }
 
         public async Task<Result<Pagination<productResponse>>> GetAllAsync(ProductSpecParams specParams)
         {
@@ -90,6 +55,29 @@ namespace Ecommerce.Application.Services.Service.Implement
             return product is not null ? Result<productResponse>.Success(product) : Result<productResponse>.Failure(ProductErrors.NotFoundProduct);
 
         }
+        public async Task<Result<productResponse>> CreateProduct(ProductRequest product)
+        {
+            var category = await _categoryRepo.GetByIdAsync(product.CategoryId);
+            if (category is null)
+                return Result<productResponse>.Failure(ProductErrors.NotFoundCate);
+
+            var brand = await _brandRepo.GetByIdAsync(product.BrandId);
+            if (brand is null)
+                return Result<productResponse>.Failure(ProductErrors.NotFoundBrand);
+
+            var newProduct = product.Adapt<Product>();
+            var createdProduct = await _Prepository.AddAsync(newProduct);
+
+
+           var result = await GetProductById(createdProduct.Id);
+
+            return Result<productResponse>.Success(result.Value);
+
+
+
+
+
+        }
 
         public async Task<Result<productResponse>> UpdateProduct(int id, ProductRequest request)
         {
@@ -107,6 +95,18 @@ namespace Ecommerce.Application.Services.Service.Implement
             var result = await GetProductById(product.Id);
             return Result<productResponse>.Success(result.Value);
 
+        }
+        public async Task<Result<bool>> DeleteProduct(int id)
+        {
+            var Spec = new ProductSpecWithBrandAndCategory(id);
+
+            var result = await _Prepository.GetByIdWithSpecAsync(Spec);
+
+            if(result is null)
+                return Result<bool>.Failure(ProductErrors.NotFoundProduct);
+
+            await _Prepository.DeleteAsync(result);
+            return Result<bool>.Success(true);
         }
     }
 }

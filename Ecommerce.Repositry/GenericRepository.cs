@@ -57,7 +57,23 @@ namespace Ecommerce.Infrastructure
         private IQueryable<T> ApplaySpecifications(ISpecification<T> spec) => 
             SpecificationEvaluator<T>.GetQuery(_dbContext.Set<T>(), spec);
 
-        
-        
+        public async Task<T> AddAsync(T entity)
+        {
+            await _dbContext.Set<T>().AddAsync(entity);
+            await _dbContext.SaveChangesAsync();
+            return entity;
+        }
+
+        public async Task UpdateAsync(T entity)
+        {
+             _dbContext.Set<T>().Update(entity);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public Task DeleteAsync(T entity)
+        {
+            _dbContext.Set<T>().Remove(entity);
+            return _dbContext.SaveChangesAsync();
+        }
     }
 }

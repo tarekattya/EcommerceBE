@@ -1,9 +1,11 @@
-﻿using Ecommerce.Core.Entites.ProductModule;
+﻿using Ecommerce.Core.Entites.Identity;
+using Ecommerce.Core.Entites.ProductModule;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):DbContext(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):IdentityDbContext<ApplicationUser>(options)
     {
 
 

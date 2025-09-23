@@ -20,5 +20,12 @@ namespace Ecommerce.Core.RepositoryContracts
 
         Task<int> GetCountAsync(ISpecification<T> spec);
 
+
+        Task<T> AddAsync(T entity);
+
+        Task UpdateAsync(T entity);
+
+        Task DeleteAsync(T entity);
+
     }
 }

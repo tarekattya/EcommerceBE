@@ -30,19 +30,26 @@ namespace Ecommerce.API.Controllers
             return response.IsSuccess ? Ok(response.Value) : NotFound(ProductErrors.NotFoundProduct);
         }
 
-        [HttpGet("brands")]
-        public async Task<ActionResult<ProductBrand>> GetBrands()
+        [HttpPost("")]
+        public async Task<ActionResult<productResponse>> CreateProduct([FromQuery] ProductRequest product)
         {
-            var brands = await _service.GetBrands();
-            return brands.IsSuccess ? Ok(brands.Value) : NotFound(ProductErrors.NotFoundBrand);
-
+            var response = await _service.CreateProduct(product);
+            return response.IsSuccess ? Ok(response.Value) : BadRequest(ProductErrors.NotFoundCate);
         }
 
-        [HttpGet("categories")]
-        public async Task<ActionResult<ProductCategory>> GetCategories()
+        [HttpPut("{id}")]
+        public async Task<ActionResult<productResponse>> UpdateProduct([FromRoute] int id, [FromQuery] ProductRequest request)
         {
-            var brands = await _service.GetCategories();
-            return brands.IsSuccess ? Ok(brands.Value) : NotFound(ProductErrors.NotFoundCate);
+            var response = await _service.UpdateProduct(id, request);
+            return response.IsSuccess ? Ok(response.Value) : BadRequest(ProductErrors.NotFoundCate);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<bool>> DeleteProduct([FromRoute] int id)
+        {
+            var response = await _service.DeleteProduct(id);
+            return response.IsSuccess ? Ok(response.Value) : BadRequest(ProductErrors.NotFoundProduct);
+
 
         }
 

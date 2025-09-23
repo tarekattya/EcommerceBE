@@ -2,6 +2,7 @@
 using Ecommerce.Application.Helper.Dtos.Product;
 using Ecommerce.Application.Services.Service.Contarct;
 using Ecommerce.Application.Services.Service.Implement;
+using Ecommerce.Core.Entites.Identity;
 using Ecommerce.Core.RepositoryContracts;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
@@ -9,6 +10,7 @@ using Ecommerce.Shared.Abstraction;
 using FluentValidation;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -30,12 +32,16 @@ namespace Ecommerce.API
             services.AddMapping(configuration);
             services.AddValidtionResponse(webApplication);
             services.AddFluentValidation();
+            services.AddIdentity();
 
 
             services.AddDBServices(configuration);
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IBrandService, BrandService>();
+            services.AddScoped<ICateGoryService, CateGoryService>();
+
             services.AddScoped<ICartService, CartService>();
             return services;
         }
@@ -60,15 +66,12 @@ namespace Ecommerce.API
 
             services.Configure<BaseUrl>(configuration.GetSection("BaseUrl"));
 
-            services.AddSingleton<IMapper>(sp =>
-            {
-                var urlOptions = sp.GetRequiredService<IOptions<BaseUrl>>();
+            var config = TypeAdapterConfig.GlobalSettings;
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var urlOptions = scope.ServiceProvider.GetRequiredService<IOptions<BaseUrl>>();
+            Config.Register(config, urlOptions);
+            services.AddSingleton<IMapper>(sp => new Mapper(TypeAdapterConfig.GlobalSettings));
 
-                var config = TypeAdapterConfig.GlobalSettings;
-                Config.Register(config, urlOptions);
-
-                return new Mapper(config);
-            });
 
             return services;
         }
@@ -78,6 +81,14 @@ namespace Ecommerce.API
 
             services.AddValidatorsFromAssembly(typeof(productResponse).Assembly);
 
+            return services;
+        }
+
+        public static IServiceCollection AddIdentity(this IServiceCollection services)
+        {
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
             return services;
         }
 

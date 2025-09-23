@@ -1,4 +1,5 @@
-﻿using Ecommerce.Core.Entites;
+﻿using Ecommerce.Application.Helper.Dtos.Product;
+using Ecommerce.Core.Entites;
 using Ecommerce.Core.Entites.ProductModule;
 using Mapster;
 using Microsoft.Extensions.Options;

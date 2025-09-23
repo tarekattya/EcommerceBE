@@ -6,29 +6,39 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Core.Specifications.ProductSpecs
 {
-    public record ProductSpecParams(string? Sort, int? BrandId, int? CategoryId , int pageIndex)
+    public record ProductSpecParams
     {
-		private const int MaxPgaeSize = 10;
-		private int pageSize;
+        private const int MaxPageSize = 10;
+        private int? _pageSize;
+        private int? _pageIndex;
+        private string? _search;
 
-		public int PageSize
+        public string? Sort { get; init; }
+        public int? BrandId { get; init; }
+        public int? CategoryId { get; init; }
+
+        // PageIndex مع default 1
+        public int pageIndex
         {
-			get { return pageSize; }
-			set { pageSize = value > MaxPgaeSize ? MaxPgaeSize : value; }
-		}
+            get => _pageIndex.HasValue && _pageIndex.Value > 0 ? _pageIndex.Value : 1;
+            init => _pageIndex = value;
+        }
 
-		private string? search;
-
-		public string? Search
+        // PageSize مع default 10 و MaxPageSize
+        public int PageSize
         {
-			get { return  search; }
-			set {  search = value?.ToLower(); }
-		}
+            get => _pageSize.HasValue && _pageSize.Value > 0 ? Math.Min(_pageSize.Value, MaxPageSize) : MaxPageSize;
+            init => _pageSize = value;
+        }
 
+        // Search يحول كل شيء لـ lowercase
+        public string? Search
+        {
+            get => _search;
+            init => _search = value?.ToLower();
+        }
+    }
 
-
-	}
-    
 
 
 }

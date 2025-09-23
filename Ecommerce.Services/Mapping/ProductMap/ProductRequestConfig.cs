@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.shared.Abstraction.Validators
+namespace Ecommerce.Application.Mapping.ProductMap
 {
-    internal class _
+    internal class ProductRequestConfig
     {
     }
 }

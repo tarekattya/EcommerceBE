@@ -1,10 +1,5 @@
-﻿using Ecommerce.API.Abstractions;
-using Ecommerce.Shared.Helper.Dtos.Cart;
-using Ecommerce.Application.Services.Service.Contarct;
-using Ecommerce.shared.Abstraction.Errors.Cart;
-using Ecommerce.Shared.Abstraction.Errors;
-using Microsoft.AspNetCore.Mvc;
-using Ecommerce.Core.Services.Service.Contarct;
+﻿using Ecommerce.Shared.Helper.Dtos.Cart;
+
 
 namespace Ecommerce.API.Controllers
 {

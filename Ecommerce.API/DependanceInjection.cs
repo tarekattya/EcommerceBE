@@ -1,22 +1,5 @@
-﻿using Ecommerce.API.Mapping.ProductMap;
-using Ecommerce.Application.Services.Service.Contarct;
-using Ecommerce.Application.Services.Service.Implement;
-using Ecommerce.Core.Entites.Identity;
-using Ecommerce.Core.RepositoryContracts;
-using Ecommerce.Core.Services.Service.Contarct;
-using Ecommerce.Infrastructure;
-using Ecommerce.Infrastructure.Data;
-using Ecommerce.Shared.Abstraction;
-using Ecommerce.Shared.Helper.Dtos.Product;
-using FluentValidation;
-using Mapster;
-using MapsterMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using StackExchange.Redis;
-using System.Runtime.Intrinsics.Arm;
+﻿
+using Ecommerce.Application.Options;
 
 namespace Ecommerce.API
 {
@@ -33,10 +16,11 @@ namespace Ecommerce.API
             services.AddMapping(configuration);
             services.AddValidtionResponse(webApplication);
             services.AddFluentValidation();
-            services.AddIdentity();
+            services.AddIdentity(configuration);
 
 
             services.AddDBServices(configuration);
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IProductService, ProductService>();
@@ -80,16 +64,50 @@ namespace Ecommerce.API
         public static IServiceCollection AddFluentValidation(this IServiceCollection services)
         {
 
-            services.AddValidatorsFromAssembly(typeof(productResponse).Assembly);
+            services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+            services.AddFluentValidationAutoValidation();
+
 
             return services;
         }
 
-        public static IServiceCollection AddIdentity(this IServiceCollection services)
+        public static IServiceCollection AddIdentity(this IServiceCollection services , IConfiguration configuration)
         {
+            services.AddSingleton<IJwtProvider, JwtProvider>();
+            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+
+            }
+
+
+            ).AddJwtBearer(o =>
+            {
+                o.SaveToken = true;
+                o.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateAudience = true,
+                    ValidateIssuer = true,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("TiGiPUGUOn20q6J0gMVP+WWnojYR2Z92gHDLc+oHmlPkntYK1NX1tgbN8yB8xl+e\r\n")),
+                    ValidIssuer = "EcommerceBE App",
+                    ValidAudience = " EcommerceBE App Users"
+                };
+
+
+
+                });
+
             return services;
         }
 

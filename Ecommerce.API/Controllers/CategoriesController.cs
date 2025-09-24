@@ -1,10 +1,5 @@
-﻿using Ecommerce.API.Abstractions;
-using Ecommerce.Shared.Helper.Dtos.Category;
-using Ecommerce.Application.Services.Service.Contarct;
-using Ecommerce.Shared.Abstraction;
-using Ecommerce.Shared.Abstraction.Errors;
-using Microsoft.AspNetCore.Mvc;
-using Ecommerce.Core.Services.Service.Contarct;
+﻿using Ecommerce.Shared.Helper.Dtos.Category;
+
 
 namespace Ecommerce.API.Controllers
 {

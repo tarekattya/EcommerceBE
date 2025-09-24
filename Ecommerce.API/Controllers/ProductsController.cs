@@ -1,13 +1,6 @@
-﻿using Ecommerce.API.Abstractions;
-using Ecommerce.API.Mapping.ProductMap;
-using Ecommerce.Application.Services.Service.Contarct;
-using Ecommerce.Core.Entites;
-using Ecommerce.Core.Entites.ProductModule;
-using Ecommerce.Core.Specifications.ProductSpecs;
-using Ecommerce.Shared.Abstraction.Errors;
+﻿using Ecommerce.Core.Specifications.ProductSpecs;
 using Ecommerce.Shared.Helper;
 using Ecommerce.Shared.Helper.Dtos.Product;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers
 {

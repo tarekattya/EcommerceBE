@@ -1,6 +1,4 @@
-﻿using Ecommerce.Shared.Abstraction;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿
 
 namespace Ecommerce.API.Controllers
 {

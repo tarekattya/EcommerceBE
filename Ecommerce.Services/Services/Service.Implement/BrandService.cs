@@ -2,6 +2,8 @@
 using Ecommerce.Core.Services.Service.Contarct;
 using Ecommerce.Core.Specifications.BranSpecs;
 using Ecommerce.Core.Specifications.ProductSpecs;
+using Ecommerce.shared.Abstraction.Errors.Product;
+using Ecommerce.shared.Abstraction.Errors.Brand;
 
 
 namespace Ecommerce.Application.Services.Service.Implement
@@ -16,7 +18,7 @@ namespace Ecommerce.Application.Services.Service.Implement
         {
             var result = await _pbrepository.GetAllAsync();
             if (result is null)
-                return Result<IReadOnlyList<BrandResponse>>.Failure(ProductErrors.NotFoundBrand);
+                return Result<IReadOnlyList<BrandResponse>>.Failure(BrandErrors.NotFoundBrand);
 
             return Result<IReadOnlyList<BrandResponse>>.Success(result.Adapt<IReadOnlyList<BrandResponse>>());
         }
@@ -26,14 +28,14 @@ namespace Ecommerce.Application.Services.Service.Implement
         {
             var barnd = await _pbrepository.GetByIdAsync(id);
             if(barnd is null)
-                return Result<BrandResponse>.Failure(ProductErrors.NotFoundBrand);
+                return Result<BrandResponse>.Failure(BrandErrors.NotFoundBrand);
             return Result<BrandResponse>.Success(barnd.Adapt<BrandResponse>());
         }
         public async Task<Result<BrandResponse>> CreateBrand(BrandRequest brand)
         {
             var exists = await _pbrepository.GetCountAsync(new BrandsByNameSpec(brand.Name));
             if (exists > 0)
-                return Result<BrandResponse>.Failure(ProductErrors.BrandNameAlreadyExists);
+                return Result<BrandResponse>.Failure(BrandErrors.BrandNameAlreadyExists);
 
             var newBrand = brand.Adapt<ProductBrand>();
             var createdBrand = await _pbrepository.AddAsync(newBrand);
@@ -45,10 +47,10 @@ namespace Ecommerce.Application.Services.Service.Implement
 
             var exists = await _pbrepository.GetCountAsync(new BrandsByNameSpec(brand.Name));
             if (exists > 0)
-                return Result<BrandResponse>.Failure(ProductErrors.BrandNameAlreadyExists);
+                return Result<BrandResponse>.Failure(BrandErrors.BrandNameAlreadyExists);
             var existingBrand = await  _pbrepository.GetByIdAsync(id);
             if (existingBrand is null)
-                return Result.Failure(ProductErrors.NotFoundBrand);
+                return Result.Failure(BrandErrors.NotFoundBrand);
             existingBrand.Name = brand.Name;
             await _pbrepository.UpdateAsync(existingBrand);
             return Result.Success();
@@ -58,12 +60,12 @@ namespace Ecommerce.Application.Services.Service.Implement
         {
             var existingBrand = await _pbrepository.GetByIdAsync(id);
             if (existingBrand is null)
-                return Result.Failure(ProductErrors.NotFoundBrand);
+                return Result.Failure(BrandErrors.NotFoundBrand);
             var Forcount = new ProductsByBrandSpec(id);
             var IsHasProduct = await _prepository.GetCountAsync(Forcount);
 
             if(IsHasProduct > 0)
-                return Result.Failure(ProductErrors.BrandHasProducts);
+                return Result.Failure(BrandErrors.BrandHasProducts);
 
             await _pbrepository.DeleteAsync(existingBrand);
             return Result.Success();

@@ -1,5 +1,8 @@
 ﻿
 using Ecommerce.Core.Specifications.ProductSpecs;
+using Ecommerce.shared.Abstraction.Errors.Brand;
+using Ecommerce.shared.Abstraction.Errors.Category;
+using Ecommerce.shared.Abstraction.Errors.Product;
 using Ecommerce.Shared.Helper;
 using Ecommerce.Shared.Helper.Dtos.Product;
 
@@ -50,11 +53,11 @@ namespace Ecommerce.Application.Services.Service.Implement
                 return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
             var category = await _categoryRepo.GetByIdAsync(product.CategoryId);
             if (category is null)
-                return Result<productResponse>.Failure(ProductErrors.NotFoundCate);
+                return Result<productResponse>.Failure(CategoryErrors.NotFoundCate);
 
             var brand = await _brandRepo.GetByIdAsync(product.BrandId);
             if (brand is null)
-                return Result<productResponse>.Failure(ProductErrors.NotFoundBrand);
+                return Result<productResponse>.Failure(BrandErrors.NotFoundBrand);
 
             var newProduct = product.Adapt<Product>();
             var createdProduct = await _Prepository.AddAsync(newProduct);

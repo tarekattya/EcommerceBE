@@ -1,0 +1,26 @@
+﻿global using Ecommerce.API.Mapping.ProductMap;
+global using Ecommerce.Application.Providers;
+global using Ecommerce.Application.Services.Service.Contarct;
+global using Ecommerce.Application.Services.Service.Implement;
+global using Ecommerce.Application.Validators.Auth;
+global using Ecommerce.Core.Entites.Identity;
+global using Ecommerce.Core.RepositoryContracts;
+global using Ecommerce.Core.Services.Service.Contarct;
+global using Ecommerce.Infrastructure;
+global using Ecommerce.Infrastructure.Data;
+global using Ecommerce.Infrastructure.Providers;
+global using Ecommerce.Shared.Abstraction;
+global using FluentValidation;
+global using Mapster;
+global using MapsterMapper;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Options;
+global using Microsoft.IdentityModel.Tokens;
+global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+global using StackExchange.Redis;
+global using System.Text;
+global using Ecommerce.API.Abstractions;
+

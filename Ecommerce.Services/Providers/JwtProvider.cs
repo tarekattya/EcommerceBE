@@ -42,11 +42,35 @@ namespace Ecommerce.Application.Providers
                 expires: DateTime.UtcNow.AddMinutes(_options.ExpireMinutes)
                 );
 
-
             return (token: new JwtSecurityTokenHandler().WriteToken(token), _options.ExpireMinutes);
+  
+        }
 
-                
-                
+        public string? ValidateToken(string token)
+        {
+            var tokenhandler = new JwtSecurityTokenHandler();
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+
+            try
+            {
+                tokenhandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    IssuerSigningKey = symmetricSecurityKey,
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = false,
+                     ValidateAudience = false,
+                     ClockSkew = TimeSpan.Zero
+
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+               return jwtToken.Claims.First(x=> x.Type == JwtRegisteredClaimNames.Sub).Value.ToString();
+            }
+            catch 
+            {
+
+                return null;
+            }
         }
     }
 }

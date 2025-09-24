@@ -1,4 +1,5 @@
 ﻿using Ecommerce.shared.Dtos.Authentcation;
+using Ecommerce.shared.Dtos.RefreshToken;
 
 namespace Ecommerce.API.Controllers
 {
@@ -12,5 +13,21 @@ namespace Ecommerce.API.Controllers
             var result = await _authService.GetTokenAsync(request.Email , request.Password , cancellationToken);
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
+
+        [HttpPost("Refresh")]
+        public async Task<ActionResult<AuthResponse>> GetRefreshToken(RefreshTokenRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _authService.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+        [HttpPut("Revoke")]
+        public async Task<ActionResult<AuthResponse>> RevokeRefreshToken(RefreshTokenRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+            return result.IsSuccess ? Ok(result) : result.ToProblem();
+        }
+
+
+
     }
 }

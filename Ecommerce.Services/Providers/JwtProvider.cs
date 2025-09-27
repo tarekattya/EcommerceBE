@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Application.Options;
 using Ecommerce.Core.Entites.Identity;
 using Ecommerce.Infrastructure.Providers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,7 +36,7 @@ namespace Ecommerce.Application.Providers
             var token = new JwtSecurityToken(
 
                 issuer: _options.Issuer,
-                audience: _options.Audience,
+            audience: _options.Audience,
                 claims: claims,
                 signingCredentials: signingCredentials,
                 expires: DateTime.UtcNow.AddMinutes(_options.ExpireMinutes)
@@ -57,9 +57,11 @@ namespace Ecommerce.Application.Providers
                 {
                     IssuerSigningKey = symmetricSecurityKey,
                     ValidateIssuerSigningKey = true,
-                    ValidateIssuer = false,
-                     ValidateAudience = false,
-                     ClockSkew = TimeSpan.Zero
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = _options.Issuer,
+                    ValidAudience = _options.Audience,
+                    ClockSkew = TimeSpan.Zero
 
                 }, out SecurityToken validatedToken);
 
@@ -72,5 +74,7 @@ namespace Ecommerce.Application.Providers
                 return null;
             }
         }
+
+       
     }
 }

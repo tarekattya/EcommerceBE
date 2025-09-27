@@ -1,14 +1,16 @@
 ﻿using Ecommerce.Core.Entites;
 using Ecommerce.Core.Entites.Identity;
 using Ecommerce.Core.Entites.ProductModule;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Ecommerce.Infrastructure.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):IdentityDbContext<ApplicationUser>(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options , IHttpContextAccessor httpContext):IdentityDbContext<ApplicationUser>(options)
     {
-
+        private readonly IHttpContextAccessor _httpContext = httpContext;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +20,24 @@ namespace Ecommerce.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
         }
 
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken =default)
+        {
+            var entries = ChangeTracker.Entries<AuditLogging>();
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Property(x => x.CreatedBy).CurrentValue = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Property(x => x.ModifiedAt).CurrentValue = DateTime.UtcNow;
+                    entry.Property(x => x.ModifiedBy).CurrentValue = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                }
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
         public DbSet<ProductBrand> ProductBrands { get; set; } = default!;
         public DbSet<ProductCategory> ProductCategories { get; set; } = default!;
         public DbSet<Product> Products { get; set; } = default!;

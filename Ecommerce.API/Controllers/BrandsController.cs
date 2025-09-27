@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Shared.Helper.Dtos.Brand;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -22,16 +23,16 @@ namespace Ecommerce.API.Controllers
             var brand = await _service.GetBrandById(id);
             return brand.IsSuccess ? Ok(brand.Value) : brand.ToProblem();
         }
-
+        [Authorize]
         [HttpPost("")]
-        public async Task<ActionResult<BrandResponse>> CreateBrand([FromQuery] BrandRequest request)
+        public async Task<ActionResult<BrandResponse>> CreateBrand([FromBody] BrandRequest request)
         {
             var brand = await _service.CreateBrand(request);
             return brand.IsSuccess ? Ok(brand.Value) : brand.ToProblem();
         }
-
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateBrand([FromRoute] int id, [FromQuery] BrandRequest request)
+        public async Task<ActionResult> UpdateBrand([FromRoute] int id, [FromBody] BrandRequest request)
         {
             var brand = await _service.UpdateBrand(id, request);
             return brand.IsSuccess ? NoContent() : brand.ToProblem();

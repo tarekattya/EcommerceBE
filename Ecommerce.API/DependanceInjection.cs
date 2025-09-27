@@ -73,9 +73,12 @@ namespace Ecommerce.API
 
         public static IServiceCollection AddIdentity(this IServiceCollection services , IConfiguration configuration)
         {
-            services.AddSingleton<IJwtProvider, JwtProvider>();
-            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
 
+            
+            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+            services.AddSingleton<IJwtProvider, JwtProvider>();
+
+            var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -85,8 +88,6 @@ namespace Ecommerce.API
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-
             }
 
 
@@ -99,13 +100,15 @@ namespace Ecommerce.API
                     ValidateAudience = true,
                     ValidateIssuer = true,
                     ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("TiGiPUGUOn20q6J0gMVP+WWnojYR2Z92gHDLc+oHmlPkntYK1NX1tgbN8yB8xl+e\r\n")),
-                    ValidIssuer = "EcommerceBE App",
-                    ValidAudience = " EcommerceBE App Users"
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!.Key)),
+
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience
+
+                    
+
+
                 };
-
-
-
                 });
 
             return services;

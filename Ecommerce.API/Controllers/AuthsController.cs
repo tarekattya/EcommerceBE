@@ -24,7 +24,7 @@ namespace Ecommerce.API.Controllers
         public async Task<ActionResult<AuthResponse>> RevokeRefreshToken(RefreshTokenRequest request, CancellationToken cancellationToken)
         {
             var result = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
-            return result.IsSuccess ? Ok(result) : result.ToProblem();
+            return result.IsSuccess ? Ok(result.IsSuccess) : result.ToProblem();
         }
 
 

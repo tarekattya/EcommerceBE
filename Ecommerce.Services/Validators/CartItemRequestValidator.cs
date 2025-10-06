@@ -10,6 +10,12 @@ namespace Ecommerce.Application.Validators
         {
             RuleFor(x => x.Quantity).GreaterThan(0).LessThan(101).WithMessage("Quantity must be greater than 0 and less than 101.");
             RuleFor(x=> x.Price).GreaterThan(0).WithMessage("Price must be greater than 0.");
+            RuleFor(x => x.ProductName).NotNull();
+            RuleFor(x => x.PictureUrl).NotNull();
+            RuleFor(x => x.Type).NotNull();
+            RuleFor(x => x.Brand).NotNull();
+            RuleFor(x => x.Id).NotNull();
+
             
 
         }

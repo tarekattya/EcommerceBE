@@ -11,15 +11,12 @@ namespace Ecommerce.Application.Services.Service.Implement
 
         public async Task<Result<CartRequest>> CreateOrUpdateAsync(CartRequest cartRequest)
         {
-            var Cart = cartRequest.Adapt<CUstomerCart>();
+            var Cart = cartRequest.Adapt<CUstomerCart>();   
             var basket = await _cartRepository.UpdateOrCreateCart(Cart);
 
             if (basket is not null)
               return await GetCartAsync(cartRequest.Id);
-            return Result<CartRequest>.Failure(CartErrors.NotFoundCart);
-
-
-
+            return Result<CartRequest>.Failure(CartErrors.CantCreateOrUpdate);
         }
 
         public async Task<Result> DeleteAsync(string key)
@@ -33,7 +30,7 @@ namespace Ecommerce.Application.Services.Service.Implement
             var basket = await _cartRepository.GetCart(key);
             if(basket is not null)
                 return Result<CartRequest>.Success(basket.Adapt<CartRequest>());
-            return Result<CartRequest>.Failure(CartErrors.CantCreateOrUpdate);    
+            return Result<CartRequest>.Failure(CartErrors.NotFoundCart);    
         }
     }
 }

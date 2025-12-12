@@ -1,12 +1,8 @@
-﻿using Ecommerce.Core.Entites;
-using Ecommerce.Core.Entites.ProductModule;
-using Ecommerce.Shared.Helper.Dtos.Product;
-using Mapster;
+﻿using Ecommerce.Shared.Helper.Dtos.Product;
 using Microsoft.Extensions.Options;
-using System.Runtime.Intrinsics.Arm;
 
-namespace Ecommerce.API.Mapping.ProductMap
-{
+namespace Ecommerce.Application;
+
     public class Config
     {
         public static void Register(TypeAdapterConfig config, IOptions<BaseUrl> urlOptions)
@@ -21,6 +17,4 @@ namespace Ecommerce.API.Mapping.ProductMap
                     : $"{baseUrl}/{src.PictureUrl.TrimStart('/')}");
         }
 
-
     }
-}

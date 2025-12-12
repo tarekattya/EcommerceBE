@@ -1,7 +1,7 @@
 ﻿
 
-namespace Ecommerce.Core.Entites.CartModule
-{
+namespace Ecommerce.Core;
+
     public class CartItem
     {
         public int Id { get; set; }
@@ -15,4 +15,4 @@ namespace Ecommerce.Core.Entites.CartModule
         public string PictureUrl { get; set; } = string.Empty;
 
     }
-}
+

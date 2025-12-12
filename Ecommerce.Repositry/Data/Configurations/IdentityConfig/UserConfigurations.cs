@@ -1,9 +1,6 @@
-﻿using Ecommerce.Core.Entites.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿
+namespace Ecommerce.Infrastructure;
 
-namespace Ecommerce.Infrastructure.Data.Configurations.IdentityConfig
-{
     internal class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
@@ -22,4 +19,4 @@ namespace Ecommerce.Infrastructure.Data.Configurations.IdentityConfig
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
-}
+

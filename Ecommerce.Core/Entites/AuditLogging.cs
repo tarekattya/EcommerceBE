@@ -1,7 +1,7 @@
 ﻿
 
-namespace Ecommerce.Core.Entites
-{
+namespace Ecommerce.Core;
+
     public class AuditLogging
     {
         public int Id { get; set; }
@@ -12,4 +12,4 @@ namespace Ecommerce.Core.Entites
         public DateTime? ModifiedAt { get; set; }
 
     }
-}
+

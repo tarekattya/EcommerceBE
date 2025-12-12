@@ -1,7 +1,6 @@
-﻿namespace Ecommerce.API.Mapping.ProductMap
+﻿namespace Ecommerce.Application;
+
+public class BaseUrl
 {
-    public class BaseUrl
-    {
-        public string BaseURL { get; set; } = default!;
-    }
+    public string BaseURL { get; set; } = default!;
 }

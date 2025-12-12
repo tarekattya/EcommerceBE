@@ -1,6 +1,6 @@
 ﻿
-namespace Ecommerce.Core.Specifications
-{
+namespace Ecommerce.Core;
+
     public class BaseSpecifications<T> : ISpecification<T> where T : AuditLogging
     {
         public Expression<Func<T, bool>>? Criteria { get; set; } = null;
@@ -37,4 +37,4 @@ namespace Ecommerce.Core.Specifications
         }
 
     }
-}
+

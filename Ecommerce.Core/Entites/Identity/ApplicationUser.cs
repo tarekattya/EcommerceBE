@@ -1,7 +1,7 @@
 ﻿
 
-namespace Ecommerce.Core.Entites.Identity
-{
+namespace Ecommerce.Core;
+
     public class ApplicationUser :IdentityUser
     {
         public string DisplayName { get; set; } = string.Empty;
@@ -10,4 +10,4 @@ namespace Ecommerce.Core.Entites.Identity
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
-}
+

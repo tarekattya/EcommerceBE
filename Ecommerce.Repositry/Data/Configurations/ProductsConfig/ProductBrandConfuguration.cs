@@ -1,14 +1,13 @@
 ﻿
 
-namespace Ecommerce.Infrastructure.Configurations.ProductsConfig
+namespace Ecommerce.Infrastructure;
+
+internal class ProductBrandConfuguration : IEntityTypeConfiguration<ProductBrand>
 {
-    internal class ProductBrandConfuguration : IEntityTypeConfiguration<ProductBrand>
+    public void Configure(EntityTypeBuilder<ProductBrand> builder)
     {
-        public void Configure(EntityTypeBuilder<ProductBrand> builder)
-        {
-            builder.Property(B => B.Name)
-               .IsRequired()
-               .HasMaxLength(80);
-        }
+        builder.Property(B => B.Name)
+           .IsRequired()
+           .HasMaxLength(80);
     }
 }

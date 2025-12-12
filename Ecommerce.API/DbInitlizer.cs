@@ -1,6 +1,4 @@
-﻿using Ecommerce.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-
+﻿
 public static class DbInitializer
 {
     public static async Task InitializeAsync(WebApplication app)

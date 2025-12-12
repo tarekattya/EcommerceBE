@@ -1,36 +1,32 @@
-﻿using Ecommerce.Shared.Helper.Dtos.Cart;
+﻿namespace Ecommerce.API;
 
-
-namespace Ecommerce.API.Controllers
+public class CartsController(ICartService cartService) : ApiBaseController
 {
-    public class CartsController(ICartService cartService) : ApiBaseController
+    private readonly ICartService _cartService = cartService;
+
+    [HttpGet("")]
+    public async Task<ActionResult<CartRequest>> GetCart(string id)
     {
-        private readonly ICartService _cartService = cartService;
-
-        [HttpGet("")]
-        public async Task<ActionResult<CartRequest>> GetCart(string id)
-        {
-            var result = await _cartService.GetCartAsync(id);
-            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
-        }
+        var result = await _cartService.GetCartAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
 
 
-        [HttpPost]
-        public async Task<ActionResult<CartRequest>> CreateOrUpdate(CartRequest cartRequest)
-        {
-            var result = await _cartService.CreateOrUpdateAsync(cartRequest);
-            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
-
-        }
-
-
-        [HttpDelete]
-        public async Task<ActionResult<CartRequest>> DeleteCart(string id)
-        {
-            var result = await _cartService.DeleteAsync(id);
-            return result.IsSuccess ? NoContent() : result.ToProblem();
-        }
-
+    [HttpPost]
+    public async Task<ActionResult<CartRequest>> CreateOrUpdate(CartRequest cartRequest)
+    {
+        var result = await _cartService.CreateOrUpdateAsync(cartRequest);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 
     }
+
+
+    [HttpDelete]
+    public async Task<ActionResult<CartRequest>> DeleteCart(string id)
+    {
+        var result = await _cartService.DeleteAsync(id);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+
+
 }

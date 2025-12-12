@@ -1,10 +1,9 @@
 ﻿
 
-namespace Ecommerce.API.Controllers
+namespace Ecommerce.API;
+
+[Route("api/[controller]")]
+[ApiController]
+public class ApiBaseController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ApiBaseController : ControllerBase
-    {
-    }
 }

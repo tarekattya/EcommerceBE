@@ -1,13 +1,5 @@
-﻿using Ecommerce.shared.Dtos.Authentcation;
-using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Ecommerce.Application;
 
-namespace Ecommerce.Application.Validators.Auth
-{
     public class LoginRequestValidator : AbstractValidator<LoginRequest>
     {
         public LoginRequestValidator()
@@ -16,4 +8,4 @@ namespace Ecommerce.Application.Validators.Auth
             RuleFor(x => x.Password).NotEmpty();
         }
     }
-}
+

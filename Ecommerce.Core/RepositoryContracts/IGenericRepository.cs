@@ -1,5 +1,5 @@
-﻿namespace Ecommerce.Core.RepositoryContracts
-{
+﻿namespace Ecommerce.Core;
+
     public interface IGenericRepository<T> where T : AuditLogging
     {
 
@@ -19,4 +19,4 @@
         Task DeleteAsync(T entity);
 
     }
-}
+

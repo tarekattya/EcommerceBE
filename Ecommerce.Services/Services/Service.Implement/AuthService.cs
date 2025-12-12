@@ -1,20 +1,5 @@
-﻿using Ecommerce.Core.Entites.Identity;
-using Ecommerce.Core.Services.Service.Contarct;
-using Ecommerce.Infrastructure.Data;
-using Ecommerce.Infrastructure.Providers;
-using Ecommerce.shared.Abstraction.Errors.Auth;
-using Ecommerce.shared.Dtos.Authentcation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Ecommerce.Application;
 
-namespace Ecommerce.Application.Services.Service.Implement
-{
     public class AuthService(UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, IJwtProvider jwtProvider) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -128,4 +113,4 @@ namespace Ecommerce.Application.Services.Service.Implement
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
     }
-}
+

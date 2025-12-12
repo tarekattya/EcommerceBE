@@ -1,13 +1,6 @@
 ﻿
-using Ecommerce.Core.Specifications.ProductSpecs;
-using Ecommerce.shared.Abstraction.Errors.Brand;
-using Ecommerce.shared.Abstraction.Errors.Category;
-using Ecommerce.shared.Abstraction.Errors.Product;
-using Ecommerce.Shared.Helper;
-using Ecommerce.Shared.Helper.Dtos.Product;
+namespace Ecommerce.Application;
 
-namespace Ecommerce.Application.Services.Service.Implement
-{
     public class ProductService(IGenericRepository<Product> repository ,
         IGenericRepository<ProductCategory> categoryRepo,
         IGenericRepository<ProductBrand> brandRepo) : IProductService
@@ -76,15 +69,18 @@ namespace Ecommerce.Application.Services.Service.Implement
                 return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
             var Spec = new ProductSpecWithBrandAndCategory(id);
             var product = await _Prepository.GetByIdWithSpecAsync(Spec);
-            product.Name = request.Name;
-            product.Price = request.Price;
-            product.BrandId = request.BrandId;
-            product.CategoryId = request.CategoryId;
-            product.PictureUrl = request.PictureUrl;
-
+            if (product is not null)
+            {
+                product.Name = request.Name;
+                product.Price = request.Price;
+                product.BrandId = request.BrandId;
+                product.CategoryId = request.CategoryId;
+                product.PictureUrl = request.PictureUrl;
             await _Prepository.UpdateAsync(product);
             var result = await GetProductById(product.Id);
             return Result<productResponse>.Success(result.Value);
+            }
+            return Result<productResponse>.Failure(ProductErrors.NotFoundProduct);
 
         }
         public async Task<Result> DeleteProduct(int id)
@@ -100,4 +96,4 @@ namespace Ecommerce.Application.Services.Service.Implement
             return Result.Success();
         }
     }
-}
+

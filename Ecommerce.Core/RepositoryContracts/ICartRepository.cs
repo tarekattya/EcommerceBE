@@ -1,6 +1,6 @@
 ﻿
-namespace Ecommerce.Core.RepositoryContracts
-{
+namespace Ecommerce.Core;
+
     public interface ICartRepository
     {
         public Task<CUstomerCart> GetCart(string key);
@@ -11,4 +11,4 @@ namespace Ecommerce.Core.RepositoryContracts
 
 
     }
-}
+

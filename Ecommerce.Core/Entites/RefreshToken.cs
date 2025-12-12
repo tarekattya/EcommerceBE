@@ -1,13 +1,5 @@
-﻿using Ecommerce.Core.Entites.Identity;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Ecommerce.Core;
 
-namespace Ecommerce.Core.Entites
-{
     public class RefreshToken
     {
         public int Id { get; set; }
@@ -22,6 +14,5 @@ namespace Ecommerce.Core.Entites
         public string UserId { get; set; } = string.Empty;
         public ApplicationUser User { get; set; } = null!;
 
-
     }
-}
+

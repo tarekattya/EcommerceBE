@@ -20,13 +20,14 @@ public class AddressController(UserManager<ApplicationUser> userManager , Applic
       var user = await _userManager.GetUserAsync(User, cancellationToken);
         if (user == null) return NotFound();
         var newAddress = request.Adapt<Address>();
-        newAddress.Id = user.Address.Id;
-        user.Address = newAddress;
-        
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return Ok(request.Adapt<AddressResponse>());
+        if (user.Address is not null)
+        {
+            newAddress.Id = user.Address.Id;
+            user.Address = newAddress;
+            await _context.SaveChangesAsync(cancellationToken);
+            return Ok(request.Adapt<AddressResponse>());
+        }
+        return BadRequest();
     }
 
 

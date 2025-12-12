@@ -1,30 +1,22 @@
-﻿global using Ecommerce.API;
-global using Ecommerce.Infrastructure;
+﻿global using Ecommerce.Infrastructure;
+global using Ecommerce.Application;
+global using Ecommerce.Shared;
 global using Ecommerce.Core;
-global using Ecommerce.Shared.Abstraction;
-global using Microsoft.AspNetCore.Authentication.JwtBearer;
-global using Microsoft.AspNetCore.Identity;
-global using Microsoft.AspNetCore.Mvc;
-global using Microsoft.EntityFrameworkCore;
-global using Microsoft.Extensions.Options;
-global using Microsoft.IdentityModel.Tokens;
+
 global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 global using StackExchange.Redis;
-global using Ecommerce.Shared.Helper;
-global using Ecommerce.Shared.Helper.Dtos.Product;
-global using Ecommerce.Shared.Helper.Dtos.Category;
-global using Ecommerce.Shared.Helper.Dtos.Cart;
-global using Ecommerce.Shared.Helper.Dtos.Brand;
-global using Microsoft.AspNetCore.Authorization;
-global using Ecommerce.shared.Dtos.Address;
-global using Ecommerce.shared.Dtos.Authentcation;
-global using Ecommerce.shared.Dtos.RefreshToken;
-global using Ecommerce.shared.Abstraction.Errors.Auth;
-global using Ecommerce.Shared.Abstraction.Errors;
-global using Ecommerce.Application;
 global using FluentValidation;
-global using Mapster;
 global using MapsterMapper;
+global using Mapster;
+
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.IdentityModel.Tokens;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Options;
+global using Microsoft.AspNetCore.Mvc;
+
 global using System.Security.Claims;
 global using System.Text.Json;
 global using System.Text;

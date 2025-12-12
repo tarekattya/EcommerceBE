@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ecommerce.Shared.Abstraction.Errors
+﻿namespace Ecommerce.Shared;
+public class ApiExceptionError : Error
 {
-    public class ApiExceptionError : Error
-    {
-        public string ErrorId { get; }
+    public string ErrorId { get; }
 
-        public ApiExceptionError(string message, string details, int statusCode , string errorId) : base(message, details, statusCode)
-        {
-            ErrorId = errorId;
-        }
+    public ApiExceptionError(string message, string details, int statusCode, string errorId) : base(message, details, statusCode)
+    {
+        ErrorId = errorId;
     }
 }

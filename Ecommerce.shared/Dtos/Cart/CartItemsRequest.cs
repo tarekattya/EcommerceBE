@@ -1,6 +1,6 @@
 ﻿
-namespace Ecommerce.Shared.Helper.Dtos.Cart
-{
+namespace Ecommerce.Shared;
+
     public record CartItemsRequest
     (
          int Id,
@@ -11,4 +11,4 @@ namespace Ecommerce.Shared.Helper.Dtos.Cart
          string Type ,
          string PictureUrl
     );
-}
+

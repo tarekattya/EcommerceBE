@@ -1,4 +1,6 @@
-﻿namespace Ecommerce.API;
+﻿using Ecommerce.Shared;
+
+namespace Ecommerce.API;
 public class BrandsController(IBrandService service) : ApiBaseController
 {
     private readonly IBrandService _service = service;

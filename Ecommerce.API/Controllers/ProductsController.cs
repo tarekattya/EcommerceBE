@@ -1,4 +1,5 @@
-﻿using Ecommerce.Core;
+﻿
+using Ecommerce.Shared;
 
 namespace Ecommerce.API;
 public class ProductsController(IProductService service) : ApiBaseController

@@ -1,4 +1,7 @@
 ﻿
+
+using Ecommerce.Shared;
+
 namespace Ecommerce.API;
 
 public static class UserManagerExtension

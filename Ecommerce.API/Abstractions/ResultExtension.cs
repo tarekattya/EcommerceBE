@@ -10,7 +10,7 @@ public static class ResultExtension
             throw new InvalidOperationException("cannot convert succes result to problem");
 
 
-        var problem = Results.Problem(statusCode:result.Error.statusCode);
+        var problem = Results.Problem(statusCode:result.Error!.statusCode);
         var problemDetails = problem.GetType().GetProperty(nameof(ProblemDetails))!.GetValue(problem) as ProblemDetails;
 
         problemDetails!.Extensions = new Dictionary<string, object?>()

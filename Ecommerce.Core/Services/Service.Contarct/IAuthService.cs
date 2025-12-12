@@ -1,4 +1,5 @@
 ﻿
+
 namespace Ecommerce.Core;
 
 public interface IAuthService

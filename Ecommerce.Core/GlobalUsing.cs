@@ -1,11 +1,9 @@
-﻿global using System;
+﻿global using Ecommerce.Shared;
+
+global using Microsoft.AspNetCore.Identity;
+
+global using System;
 global using System.Collections.Generic;
 global using System.Threading.Tasks;
 global using System.Linq.Expressions;
-global using Microsoft.AspNetCore.Identity;
-global using Ecommerce.Shared.Helper.Dtos.Category;
-global using Ecommerce.Shared.Abstraction;
-global using Ecommerce.shared.Dtos.Authentcation;
-global using Ecommerce.Shared.Helper.Dtos.Brand;
-global using Ecommerce.Shared.Helper.Dtos.Product;
-global using Ecommerce.Shared.Helper;
+

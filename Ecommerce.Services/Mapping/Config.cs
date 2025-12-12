@@ -1,7 +1,4 @@
-﻿using Ecommerce.Shared.Helper.Dtos.Product;
-using Microsoft.Extensions.Options;
-
-namespace Ecommerce.Application;
+﻿namespace Ecommerce.Application;
 
     public class Config
     {

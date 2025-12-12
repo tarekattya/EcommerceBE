@@ -1,9 +1,4 @@
 ﻿
-
-
-using Ecommerce.Shared.Abstraction;
-using Ecommerce.Shared.Helper.Dtos.Cart;
-
 namespace Ecommerce.Core;
 
     public interface ICartService

@@ -1,4 +1,6 @@
-﻿namespace Ecommerce.Core;
+﻿using Ecommerce.Shared;
+
+namespace Ecommerce.Core;
 
     public interface IBrandService
     {

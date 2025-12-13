@@ -1,4 +1,4 @@
-﻿
+﻿namespace Ecommerce.Api;
 public static class DbInitializer
 {
     public static async Task InitializeAsync(WebApplication app)
@@ -16,9 +16,9 @@ public static class DbInitializer
         }
         catch (Exception ex)
         {
-           var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-var logger = loggerFactory.CreateLogger("DbInitializer");
-logger.LogError(ex, "An error occurred during migration or seeding.");
+            var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger("DbInitializer");
+            logger.LogError(ex, "An error occurred during migration or seeding.");
 
         }
     }

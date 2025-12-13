@@ -1,7 +1,7 @@
 ﻿
 namespace Ecommerce.Core;
 
-    public interface ISpecification<T> where T : AuditLogging
+    public interface ISpecification<T> where T : BaseEntity
     {
         public Expression<Func<T , bool>>? Criteria { get; set; }
 

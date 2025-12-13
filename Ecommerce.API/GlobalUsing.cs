@@ -1,4 +1,6 @@
-﻿global using Ecommerce.Infrastructure;
+﻿global using Ecommerce.Api;
+
+global using Ecommerce.Infrastructure;
 global using Ecommerce.Application;
 global using Ecommerce.Shared;
 global using Ecommerce.Core;

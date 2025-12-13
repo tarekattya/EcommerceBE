@@ -1,6 +1,6 @@
 ﻿namespace Ecommerce.Core;
 
-    public interface IGenericRepository<T> where T : AuditLogging
+    public interface IGenericRepository<T> where T : BaseEntity
     {
 
         Task<IReadOnlyList<T>> GetAllAsync();

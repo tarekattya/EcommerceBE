@@ -1,6 +1,6 @@
 ﻿namespace Ecommerce.Infrastructure;
 
-public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepository<T> where T : AuditLogging
+public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepository<T> where T : BaseEntity
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
 

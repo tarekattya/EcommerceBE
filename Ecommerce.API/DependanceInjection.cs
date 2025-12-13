@@ -1,6 +1,4 @@
-﻿using Ecommerce.Core;
-
-namespace Ecommerce.API;
+﻿namespace Ecommerce.API;
 
 public static class DependanceInjection
 {

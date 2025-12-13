@@ -1,7 +1,7 @@
 ﻿
 namespace Ecommerce.Core;
 
-    public class BaseSpecifications<T> : ISpecification<T> where T : AuditLogging
+    public class BaseSpecifications<T> : ISpecification<T> where T : BaseEntity
     {
         public Expression<Func<T, bool>>? Criteria { get; set; } = null;
         public List<Expression<Func<T, object>>> Includes { get; set; } = new List<Expression<Func<T, object>>>();

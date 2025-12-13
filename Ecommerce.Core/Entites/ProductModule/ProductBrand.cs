@@ -1,6 +1,6 @@
 ﻿namespace Ecommerce.Core;
 
-    public class ProductBrand : AuditLogging
+    public class ProductBrand : BaseEntity
     {
         public string Name { get; set; } = default!;
 

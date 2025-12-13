@@ -2,7 +2,7 @@
 
 namespace Ecommerce.Core;
 
-    public class AuditLogging
+    public class BaseEntity
     {
         public int Id { get; set; }
 

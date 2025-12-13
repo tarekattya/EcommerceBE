@@ -16,7 +16,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken =default)
     {
-        var entries = ChangeTracker.Entries<AuditLogging>();
+        var entries = ChangeTracker.Entries<BaseEntity>();
         foreach (var entry in entries)
         {
             if (entry.State == EntityState.Added)
@@ -35,6 +35,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ProductBrand> ProductBrands { get; set; } = default!;
     public DbSet<ProductCategory> ProductCategories { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
+    public DbSet<Core.Order> Orders { get; set; } = default!;
+    public DbSet<OrderItem> OrderItems { get; set; } = default!;
+    public DbSet<DeliveryMethod> DeliveryMethods { get; set; } = default!;
+
+    
     public DbSet<RefreshToken> RefreshTokens { get; set; } = default!;
 
 

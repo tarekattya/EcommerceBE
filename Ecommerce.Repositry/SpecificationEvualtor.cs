@@ -1,6 +1,6 @@
 ﻿namespace Ecommerce.Infrastructure;
 
-public static class SpecificationEvaluator<T> where T : AuditLogging
+public static class SpecificationEvaluator<T> where T : BaseEntity
 {
 
    public static IQueryable<T> GetQuery(IQueryable<T> InputQuery , ISpecification<T> spec)

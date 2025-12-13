@@ -48,7 +48,19 @@ public static class ApplicationDbSeeding
                 await dbContext.SaveChangesAsync();
             }
         }
-
+        if (dbContext.DeliveryMethods.Count() == 0)
+        {
+            var delivermethods = File.ReadAllText("F:\\Ecommerce\\Ecommerce.Repositry\\DataSeed\\delivery.json");
+            var delivermethodsList = JsonSerializer.Deserialize<List<DeliveryMethod>>(delivermethods);
+            if (delivermethodsList?.Count > 0)
+            {
+                foreach (var delivermethod in delivermethodsList)
+                {
+                    dbContext.DeliveryMethods.Add(delivermethod);
+                }
+                await dbContext.SaveChangesAsync();
+            }
+        }
 
     }
 }

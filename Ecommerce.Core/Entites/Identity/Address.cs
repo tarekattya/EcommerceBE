@@ -1,7 +1,7 @@
 ﻿
 namespace Ecommerce.Core;
 
-public class Address : AuditLogging
+public class Address : BaseEntity
 {
     public string City { get; set; } = string.Empty;
     public string Street { get; set; } = string.Empty;

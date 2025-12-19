@@ -4,6 +4,14 @@ namespace Ecommerce.Infrastructure;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options , IHttpContextAccessor httpContext):IdentityDbContext<ApplicationUser>(options)
 {
+
+    public ApplicationDbContext CreateDbContext(string[] args)
+    { 
+        return new ApplicationDbContext(
+            options,
+            new HttpContextAccessor()
+        );
+    }
     private readonly IHttpContextAccessor _httpContext = httpContext;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

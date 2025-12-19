@@ -27,17 +27,16 @@ public static class DependanceInjection
         return services;
     }
 
-    public static IServiceCollection AddDBServices(this IServiceCollection services , IConfiguration configuration)
+    public static IServiceCollection AddDBServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<ApplicationDbContext>(
             options =>
             {
-                options/*.UseLazyLoadingProxies()*/.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options/*.UseLazyLoadingProxies()*/.UseSqlite(configuration.GetConnectionString("Data"));
             });
 
         services.AddSingleton<IConnectionMultiplexer>(sp =>
-        {
-            
+        { 
             return ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")!);
         });
         return services;
@@ -47,12 +46,11 @@ public static class DependanceInjection
 
         services.Configure<BaseUrl>(configuration.GetSection("BaseUrl"));
 
-        var config = TypeAdapterConfig.GlobalSettings;
-        using var scope = services.BuildServiceProvider().CreateScope();
-        var urlOptions = scope.ServiceProvider.GetRequiredService<IOptions<BaseUrl>>();
+        TypeAdapterConfig config = TypeAdapterConfig.GlobalSettings;
+        using IServiceScope scope = services.BuildServiceProvider().CreateScope();
+        IOptions<BaseUrl> urlOptions = scope.ServiceProvider.GetRequiredService<IOptions<BaseUrl>>();
         Config.Register(config, urlOptions);
         services.AddSingleton<IMapper>(sp => new Mapper(TypeAdapterConfig.GlobalSettings));
-
 
         return services;
     }

@@ -1,14 +1,12 @@
 ﻿namespace Ecommerce.Application;
 
-public class BrandService(IGenericRepository<ProductBrand> Pbrepository , IGenericRepository<Product> prepository) : IBrandService
+public class BrandService(IUnitOfWork unitOfWork) : IBrandService
 {
-    private readonly IGenericRepository<ProductBrand> _pbrepository = Pbrepository;
-    private readonly IGenericRepository<Product> _prepository = prepository;
-
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<Result<IReadOnlyList<BrandResponse>>> GetBrands()
     {
-        var result = await _pbrepository.GetAllAsync();
+        var result = await _unitOfWork.Repository<ProductBrand>().GetAllAsync();
         if (result is null)
             return Result<IReadOnlyList<BrandResponse>>.Failure(BrandErrors.NotFoundBrand);
 
@@ -18,51 +16,56 @@ public class BrandService(IGenericRepository<ProductBrand> Pbrepository , IGener
 
     public async Task<Result<BrandResponse>> GetBrandById(int id)
     {
-        var barnd = await _pbrepository.GetByIdAsync(id);
+        var barnd = await _unitOfWork.Repository<ProductBrand>().GetByIdAsync(id);
         if(barnd is null)
             return Result<BrandResponse>.Failure(BrandErrors.NotFoundBrand);
         return Result<BrandResponse>.Success(barnd.Adapt<BrandResponse>());
     }
+
     public async Task<Result<BrandResponse>> CreateBrand(BrandRequest brand)
     {
-        var exists = await _pbrepository.GetCountAsync(new BrandsByNameSpec(brand.Name));
+        int exists = await _unitOfWork.Repository<ProductBrand>().GetCountAsync(new BrandsByNameSpec(brand.Name));
         if (exists > 0)
             return Result<BrandResponse>.Failure(BrandErrors.BrandNameAlreadyExists);
 
         var newBrand = brand.Adapt<ProductBrand>();
-        var createdBrand = await _pbrepository.AddAsync(newBrand);
+        var createdBrand = await _unitOfWork.Repository<ProductBrand>().AddAsync(newBrand);
+        if (createdBrand is null)
+            return Result<BrandResponse>.Failure(BrandErrors.CantCreateBrand);
+        await _unitOfWork.CompleteAsync();
+
         return Result<BrandResponse>.Success(createdBrand.Adapt<BrandResponse>());
 
     }
     public async Task<Result> UpdateBrand(int id , BrandRequest brand)
     {
 
-        var exists = await _pbrepository.GetCountAsync(new BrandsByNameSpec(brand.Name));
+        var exists = await _unitOfWork.Repository<ProductBrand>().GetCountAsync(new BrandsByNameSpec(brand.Name));
         if (exists > 0)
             return Result<BrandResponse>.Failure(BrandErrors.BrandNameAlreadyExists);
-        var existingBrand = await  _pbrepository.GetByIdAsync(id);
+        var existingBrand = await  _unitOfWork.Repository<ProductBrand>().GetByIdAsync(id);
         if (existingBrand is null)
             return Result.Failure(BrandErrors.NotFoundBrand);
         existingBrand.Name = brand.Name;
-        await _pbrepository.UpdateAsync(existingBrand);
+         _unitOfWork.Repository<ProductBrand>().Update(existingBrand);
+        await _unitOfWork.CompleteAsync(); 
         return Result.Success();
 
     }
     public async Task<Result> DeleteBrand(int id)
     {
-        var existingBrand = await _pbrepository.GetByIdAsync(id);
+        var existingBrand = await _unitOfWork.Repository<ProductBrand>().GetByIdAsync(id);
         if (existingBrand is null)
             return Result.Failure(BrandErrors.NotFoundBrand);
         var Forcount = new ProductsByBrandSpec(id);
-        var IsHasProduct = await _prepository.GetCountAsync(Forcount);
+        var IsHasProduct = await _unitOfWork.Repository<Product>().GetCountAsync(Forcount);
 
         if(IsHasProduct > 0)
             return Result.Failure(BrandErrors.BrandHasProducts);
 
-        await _pbrepository.DeleteAsync(existingBrand);
+        _unitOfWork.Repository<ProductBrand>().Delete(existingBrand);
+        await _unitOfWork.CompleteAsync();
         return Result.Success();
-
-
 
     }
 }

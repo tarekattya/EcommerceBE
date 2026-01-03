@@ -14,9 +14,9 @@
 
         Task<T> AddAsync(T entity);
 
-        Task UpdateAsync(T entity);
+        void Update(T entity);
 
-        Task DeleteAsync(T entity);
+        void Delete(T entity);
 
     }
 

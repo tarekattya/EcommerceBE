@@ -1,14 +1,15 @@
 ﻿
 namespace Ecommerce.Core;
 
-    public interface ICartRepository
-    {
-        public Task<CUstomerCart> GetCart(string key);
+public interface ICartRepository
+{
+    public Task<CustomerCart?> GetCartAsync(string key);
 
-        public Task<CUstomerCart> UpdateOrCreateCart(CUstomerCart cart , TimeSpan? time = null);
+    public Task<CustomerCart?> UpdateCartAsync(CustomerCart cart, TimeSpan? time = null);
+    public Task<CustomerCart?> CreateCartAsync(CustomerCart cart, TimeSpan? time = null);
 
-        public Task<bool> DeleteCart(string id);
+    public Task<bool> DeleteCartAsync(string id);
 
 
-    }
+}
 

@@ -1,7 +1,6 @@
 ﻿global using Ecommerce.Infrastructure;
-global using Ecommerce.Core;
 global using Ecommerce.Shared;
-
+global using Ecommerce.Core;
 
 global using FluentValidation;
 global using Mapster;

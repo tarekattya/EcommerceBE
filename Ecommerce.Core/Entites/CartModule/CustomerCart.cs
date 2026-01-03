@@ -2,7 +2,7 @@
 
 namespace Ecommerce.Core;
 
-public class CUstomerCart
+public class CustomerCart
 {
     public string Id { get; set; } = string.Empty;
 

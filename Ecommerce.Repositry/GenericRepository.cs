@@ -5,14 +5,12 @@ public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepo
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     public async Task<IReadOnlyList<T>> GetAllAsync()
-    {
-        return await _dbContext.Set<T>().AsNoTracking().ToListAsync();
-    }
+        => await _dbContext.Set<T>().AsNoTracking().ToListAsync();
+    
 
     public async Task<T?> GetByIdAsync(int id)
-    {
-        return await _dbContext.Set<T>().FindAsync(id);
-    }
+      => await _dbContext.Set<T>().FindAsync(id);
+    
     public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec)
     {
         var data = await ApplaySpecifications(spec)
@@ -36,9 +34,7 @@ public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepo
 
     }
     public async Task<int> GetCountAsync(ISpecification<T> spec)
-    {
-        return await ApplaySpecifications(spec).CountAsync();
-    }
+        => await ApplaySpecifications(spec).CountAsync();
 
 
     private IQueryable<T> ApplaySpecifications(ISpecification<T> spec) => 
@@ -46,20 +42,13 @@ public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepo
 
     public async Task<T> AddAsync(T entity)
     {
-        await _dbContext.Set<T>().AddAsync(entity);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.AddAsync(entity);
         return entity;
     }
 
-    public async Task UpdateAsync(T entity)
-    {
-         _dbContext.Set<T>().Update(entity);
-        await _dbContext.SaveChangesAsync();
-    }
-
-    public Task DeleteAsync(T entity)
-    {
-        _dbContext.Set<T>().Remove(entity);
-        return _dbContext.SaveChangesAsync();
-    }
+    public void Update(T entity)
+    => _dbContext.Update(entity);
+    public void Delete(T entity)
+    => _dbContext.Remove(entity);
+    
 }

@@ -17,7 +17,7 @@ public class Order : BaseEntity
     public string BuyerEmail { get; set; } = string.Empty;
     public DateTimeOffset OrderDate { get; set; } = DateTimeOffset.UtcNow;
 
-    public OrderStatus Status { get; set; } = OrderStatus.pending;
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
     public OrderAddress ShipingAddress { get; set; } = default!;
 

@@ -67,7 +67,6 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
         if (cartRequest.Items is null || !cartRequest.Items.Any())
             return Result<CartResponse>.Failure(CartErrors.EmptyCart);
 
-        // جلب بيانات المنتجات الموجودة فقط
         var existingItemIds = cart.Items.Select(i => i.Id).ToList();
         var requestItemIds = cartRequest.Items.Select(i => i.Id).ToList();
         var intersectIds = existingItemIds.Intersect(requestItemIds).ToList();

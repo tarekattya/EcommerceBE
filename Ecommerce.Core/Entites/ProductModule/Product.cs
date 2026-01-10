@@ -9,6 +9,7 @@ public class Product : BaseEntity
     public int BrandId { get; set; }
     public ProductBrand Brand { get; set; } = default!;
     public int CategoryId { get; set; }
+    public int Stock { get; set; }
     public ProductCategory Category { get; set; } = default!;
 
 }

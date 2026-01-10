@@ -3,7 +3,7 @@
 namespace Ecommerce.Core;
 public interface IOrderService
 {
-    Task<Result<OrderResponse>> CreateOrderAsync(OrderRequest dto);
+    Task<Result<OrderResponse>> CreateOrderAsync(OrderRequest request);
 
     Task<Result<OrderResponse>> GetOrderByIdAsync(int id);
 

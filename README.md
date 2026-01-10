@@ -29,7 +29,7 @@ The project is designed for future expansion to handle **orders, checkout, and p
 
 ## Technologies & Tools
 
-* **.NET 9**
+* **.NET 10**
 * **C#**
 * **Entity Framework Core (Code-First Approach)**
 * **Clean Architecture** (Domain, Application, Infrastructure, API layers + Shared layer)

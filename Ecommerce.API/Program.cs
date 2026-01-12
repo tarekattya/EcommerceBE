@@ -4,11 +4,11 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder?  builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddApplicationServices(builder.Configuration , builder);
 
-        var app = builder.Build();
+        WebApplication? app = builder.Build();
 
         await DbInitializer.InitializeAsync(app);
 

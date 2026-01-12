@@ -13,11 +13,10 @@ public class OrderResponseValidator : AbstractValidator<OrderResponse>
     public OrderResponseValidator()
     {
         RuleFor(x => x.Id).GreaterThan(minValue);
-        RuleFor(x => x.BuyerEmail).NotEmpty().EmailAddress();
+        RuleFor(x => x.BuyerEmail).EmailAddress();
         RuleFor(x => x.OrderDate).LessThanOrEqualTo(DateTimeOffset.Now);
         RuleForEach(x => x.Items).SetValidator(new OrderItemResponseValidator());
         RuleFor(x => x.DeliveryMethodName).NotEmpty();
-        RuleFor(x => x.OrderStatus).InclusiveBetween(minValue, maxStatusValue); 
         RuleFor(x => x.OrderAddress).SetValidator(new OrderAddressRequestValidator());
         RuleFor(x => x.SubTotal).GreaterThanOrEqualTo(minValue);
         RuleFor(x => x.Total).GreaterThanOrEqualTo(x => x.SubTotal);

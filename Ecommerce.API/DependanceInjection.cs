@@ -1,4 +1,6 @@
-﻿namespace Ecommerce.API;
+﻿using Newtonsoft.Json.Converters;
+
+namespace Ecommerce.API;
 
 public static class DependanceInjection
 {
@@ -6,7 +8,11 @@ public static class DependanceInjection
    
     public static IServiceCollection AddApplicationServices(this IServiceCollection services ,IConfiguration configuration,WebApplicationBuilder webApplication)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
         services.AddOpenApi();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

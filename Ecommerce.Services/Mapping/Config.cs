@@ -1,4 +1,6 @@
-﻿using Ecommerce.Shared;
+﻿using System.Reflection;
+using System.Runtime.Serialization;
+using Ecommerce.Shared;
 
 namespace Ecommerce.Application;
 
@@ -23,8 +25,15 @@ public class Config
           src => string.IsNullOrEmpty(src.PictureUrl)
                  ? null
                  : $"{baseUrl}/{src.PictureUrl.TrimStart('/')}");
-
-
+        TypeAdapterConfig<OrderAddressRequest, OrderAddress>.NewConfig();
+        TypeAdapterConfig<Order, OrderResponse>.NewConfig()
+            .Map(dest => dest.OrderAddress, src => src.ShipingAddress)
+            .Map(dest => dest.DeliveryMethodName, src => src.DeliveryMethod.ShortName)
+            .Map(dest => dest.Items, src => src.Items);
+        TypeAdapterConfig<OrderItem, OrderItemResponse>.NewConfig()
+            .Map(dest => dest.ProductId, src => src.ProductItemOrderd.ProductId)
+            .Map(dest => dest.ProductName, src => src.ProductItemOrderd.Name)
+            .Map(dest => dest.PictureUrl, src => src.ProductItemOrderd.PictureUrl);
     }
 
 }

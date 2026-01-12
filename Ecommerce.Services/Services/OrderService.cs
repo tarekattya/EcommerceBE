@@ -6,9 +6,10 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ICartRepository _cartRepository = cartRepository;
 
-    public async Task<Result<OrderResponse>> GetOrderByIdAsync(int id)
+    public async Task<Result<OrderResponse>> GetOrderByIdAsync(int id )
     {
-        var order = await _unitOfWork.Repository<Order>().GetByIdAsync(id);
+        OrderSpecification orderSpecification = new OrderSpecification(id);
+        Order? order = await _unitOfWork.Repository<Order>().GetByIdWithSpecAsync(orderSpecification);
         if (order is null)
             return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
         return Result<OrderResponse>.Success(order.Adapt<OrderResponse>());
@@ -19,21 +20,21 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
     }
 
     public async Task<Result<OrderResponse>> CreateOrderAsync(OrderRequest request)
-    {
-        var cart = await _cartRepository.GetCartAsync(request.BasketId);
+    {   
+        CustomerCart? cart = await _cartRepository.GetCartAsync(request.BasketId);
         if (cart is null || cart.Items == null || !cart.Items.Any())
             return Result<OrderResponse>.Failure(CartErrors.EmptyCart);
 
-        var deliveryMethod = await _unitOfWork
+        DeliveryMethod? deliveryMethod = await _unitOfWork
             .Repository<DeliveryMethod>()
             .GetByIdAsync(request.DeliveryMethodId);
 
         if (deliveryMethod is null)
             return Result<OrderResponse>.Failure(OrderErrors.InvalidDeliveryMethod);
 
-        foreach (var cartItem in cart.Items)
+        foreach (CartItem cartItem in cart.Items)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(cartItem.Id);
+            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(cartItem.Id);
 
             if (product is null)
                 return Result<OrderResponse>.Failure(ProductErrors.NotFoundProduct);
@@ -41,21 +42,23 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
             if (cartItem.Quantity > product.Stock)
                 return Result<OrderResponse>.Failure(ProductErrors.TheQuantityNotEnough);
         }
-        var items = cart.Items.Select(item => new OrderItem
+        List<OrderItem>? items = cart.Items.Select(item => new OrderItem
         {
             ProductItemOrderd = new ProductItemOrderd
             {
                 ProductId = item.Id,
                 Name = item.ProductName,
-                PictureUrl = item.PictureUrl
+                PictureUrl = item.PictureUrl,
+                Description =item.Description
+
             },
             Price = item.Price,
             Quantity = item.Quantity
         }).ToList();
 
-        var subtotal = items.Sum(item => item.Price * item.Quantity);
+        decimal subtotal = items.Sum(item => item.Price * item.Quantity);
 
-        var newOrder = new Order(
+        Order? newOrder = new Order(
             request.buyerEmail,
             request.OrderAddress.Adapt<OrderAddress>(),
             deliveryMethod,
@@ -65,15 +68,15 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
 
         await _unitOfWork.Repository<Order>().AddAsync(newOrder);
 
-        foreach (var cartItem in cart.Items)
+        foreach (CartItem cartItem in cart.Items)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(cartItem.Id);
-            product.Stock -= cartItem.Quantity;
+            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(cartItem.Id);
+            product!.Stock -= cartItem.Quantity;
             _unitOfWork.Repository<Product>().Update(product);
         }
         await _unitOfWork.CompleteAsync();
-        var orderResponse = newOrder.Adapt<OrderResponse>();
-        return Result<OrderResponse>.Success(orderResponse);
+        await _cartRepository.DeleteCartAsync(request.BasketId);
+        return Result<OrderResponse>.Success(newOrder.Adapt<OrderResponse>());
     }
 
 

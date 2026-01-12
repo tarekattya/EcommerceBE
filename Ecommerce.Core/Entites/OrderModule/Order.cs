@@ -23,7 +23,7 @@ public class Order : BaseEntity
 
     public DeliveryMethod DeliveryMethod { get; set; } = default!;
 
-    ICollection<OrderItem> Items { get; set; } = new HashSet<OrderItem>();
+   public ICollection<OrderItem> Items { get; set; } = new HashSet<OrderItem>();
 
     public decimal SubTotal { get; set; }
 

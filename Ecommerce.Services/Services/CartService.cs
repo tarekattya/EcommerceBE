@@ -10,30 +10,30 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
         if (string.IsNullOrWhiteSpace(cartRequest.Id))
             return Result<CartResponse>.Failure(CartErrors.InvalidCartId);
 
-        var existingCart = await _cartRepository.GetCartAsync(cartRequest.Id);
+        CustomerCart? existingCart = await _cartRepository.GetCartAsync(cartRequest.Id);
         if (existingCart is not null)
             return Result<CartResponse>.Failure(CartErrors.InvalidCartId);
 
         if (cartRequest.Items is null || !cartRequest.Items.Any())
             return Result<CartResponse>.Failure(CartErrors.EmptyCart);
 
-        var cart = new CustomerCart
+        CustomerCart? cart = new CustomerCart
         {
             Id = cartRequest.Id,
             Items = new List<CartItem>()
         };
 
-        var productIds = cartRequest.Items.Select(i => i.Id).ToList();
-        var products = await _unitOfWork.Repository<Product>()
+        List<int>? productIds = cartRequest.Items.Select(i => i.Id).ToList();
+        IReadOnlyList<Product>? products = await _unitOfWork.Repository<Product>()
             .GetAllWithSpecAsync(new ProductsByIdsSpec(productIds));
 
-        foreach (var itemRequest in cartRequest.Items)
+        foreach (CartItemsRequest itemRequest in cartRequest.Items)
         {
-            var product = products.FirstOrDefault(p => p.Id == itemRequest.Id);
+            Product? product = products.FirstOrDefault(p => p.Id == itemRequest.Id);
             if (product is null)
                 return Result<CartResponse>.Failure(ProductErrors.NotFoundProduct);
 
-            var cartItem = product.Adapt<CartItem>();
+            CartItem? cartItem = product.Adapt<CartItem>();
             cartItem.Quantity = itemRequest.Quantity;
             cart.Items.Add(cartItem);
         }
@@ -50,6 +50,7 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
 
         var createdCart = await _cartRepository.CreateCartAsync(cart);
 
+        
         return createdCart is not null
             ? Result<CartResponse>.Success(createdCart.Adapt<CartResponse>())
             : Result<CartResponse>.Failure(CartErrors.CantCreateCart);

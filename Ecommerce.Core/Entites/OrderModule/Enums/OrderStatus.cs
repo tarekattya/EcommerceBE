@@ -1,7 +1,9 @@
 ﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Ecommerce.Core
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum OrderStatus
     {
         [EnumMember(Value = "Pending")]

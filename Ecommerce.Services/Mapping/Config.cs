@@ -6,6 +6,15 @@ namespace Ecommerce.Application;
 
 public class Config
 {
+    private static string GetEnumMemberValue(Enum enumValue)
+    {
+        var field = enumValue.GetType().GetField(enumValue.ToString());
+        if (field == null) return enumValue.ToString();
+        
+        var attribute = field.GetCustomAttribute<EnumMemberAttribute>();
+        return attribute?.Value ?? enumValue.ToString();
+    }
+
     public static void Register(TypeAdapterConfig config, IOptions<BaseUrl> urlOptions)
     {
         var baseUrl = urlOptions.Value.BaseURL;
@@ -29,7 +38,9 @@ public class Config
         TypeAdapterConfig<Order, OrderResponse>.NewConfig()
             .Map(dest => dest.OrderAddress, src => src.ShipingAddress)
             .Map(dest => dest.DeliveryMethodName, src => src.DeliveryMethod.ShortName)
-            .Map(dest => dest.Items, src => src.Items);
+            .Map(dest => dest.Items, src => src.Items)
+            .Map(dest => dest.OrderStatus, src => GetEnumMemberValue(src.Status))
+            .Map(dest => dest.Total, src => src.GetTotal());
         TypeAdapterConfig<OrderItem, OrderItemResponse>.NewConfig()
             .Map(dest => dest.ProductId, src => src.ProductItemOrderd.ProductId)
             .Map(dest => dest.ProductName, src => src.ProductItemOrderd.Name)

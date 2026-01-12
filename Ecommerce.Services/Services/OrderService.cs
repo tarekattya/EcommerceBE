@@ -14,9 +14,21 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
             return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
         return Result<OrderResponse>.Success(order.Adapt<OrderResponse>());
     }
-    public Task<Result<string>> CancelOrderAsync(int orderId)
+    public async Task<Result> CancelOrderAsync(int orderId)
     {
-        throw new NotImplementedException();
+        OrderSpecification orderSpecification = new OrderSpecification(orderId);
+        Order? order = await _unitOfWork.Repository<Order>().GetByIdWithSpecAsync(orderSpecification);
+        
+        if (order is null)
+            return Result.Failure(OrderErrors.NotFoundOrder);
+
+        Result? result = order.Cancel();
+        if (!result.IsSuccess) return result;
+
+        _unitOfWork.Repository<Order>().Update(order);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success();
     }
 
     public async Task<Result<OrderResponse>> CreateOrderAsync(OrderRequest request)
@@ -63,30 +75,48 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
             request.OrderAddress.Adapt<OrderAddress>(),
             deliveryMethod,
             items,
-            subtotal
+            subtotal,
+            request.IsCOD
         );
 
         await _unitOfWork.Repository<Order>().AddAsync(newOrder);
 
-        foreach (CartItem cartItem in cart.Items)
-        {
-            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(cartItem.Id);
-            product!.Stock -= cartItem.Quantity;
-            _unitOfWork.Repository<Product>().Update(product);
-        }
         await _unitOfWork.CompleteAsync();
         await _cartRepository.DeleteCartAsync(request.BasketId);
         return Result<OrderResponse>.Success(newOrder.Adapt<OrderResponse>());
     }
 
 
-    public Task<Result<IReadOnlyList<OrderResponse>>> GetOrdersByUserIdAsync(Guid userId)
+    public async Task<Result<IReadOnlyList<OrderResponse>>> GetOrdersForUserAsync(string email)
     {
-        throw new NotImplementedException();
+        OrdersByEmailSpec orderSpecification = new OrdersByEmailSpec(email);
+        IReadOnlyList<Order> orders = await _unitOfWork.Repository<Order>().GetAllWithSpecAsync(orderSpecification);
+        
+        if (orders == null || !orders.Any())
+            return Result<IReadOnlyList<OrderResponse>>.Failure(OrderErrors.NotFoundOrder);
+        
+        return Result<IReadOnlyList<OrderResponse>>.Success(orders.Adapt<IReadOnlyList<OrderResponse>>());
     }
 
-    public Task<Result<string>> UpdateOrderStatusAsync(int orderId, OrderStatus status)
-    {
-        throw new NotImplementedException();
+    public async Task<Result<OrderResponse>> UpdateOrderStatusAsync(int orderId, UpdateOrderStatusRequest request)
+    { 
+        OrderSpecification orderSpecification = new OrderSpecification(orderId);
+        Order? order = await _unitOfWork.Repository<Order>().GetByIdWithSpecAsync(orderSpecification);
+        
+        if (order is null)
+            return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
+        if (!Enum.TryParse<OrderStatus>(request.Status, true, out OrderStatus statusEnum))
+        {
+            return Result<OrderResponse>.Failure(OrderErrors.InvalidStatus);
+        }
+
+        Result? result = order.UpdateStatus(statusEnum);
+        if (!result.IsSuccess) 
+            return Result<OrderResponse>.Failure(OrderErrors.InvalidStatusUpdate);
+
+        _unitOfWork.Repository<Order>().Update(order);
+        await _unitOfWork.CompleteAsync();
+
+        return Result<OrderResponse>.Success(order.Adapt<OrderResponse>());
     }
 }

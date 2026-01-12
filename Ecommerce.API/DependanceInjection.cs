@@ -1,4 +1,7 @@
 ﻿using Newtonsoft.Json.Converters;
+using Ecommerce.Core;
+using Ecommerce.Services;
+using Ecommerce.Application;
 
 namespace Ecommerce.API;
 
@@ -32,6 +35,9 @@ public static class DependanceInjection
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IDomainEventHandler<OrderStockReleaseEvent>, OrderStockReleaseHandler>();
+        services.AddScoped<IDomainEventHandler<OrderProcessingStartedEvent>, OrderProcessingStartedHandler>();
+
         return services;
     }
 

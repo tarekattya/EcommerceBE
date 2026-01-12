@@ -38,19 +38,27 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         var exists = await _unitOfWork.Repository<Product>().GetCountAsync(new ProductsByNameSpec(product.Name));
         if (exists > 0)
             return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
-        var category = await _unitOfWork.Repository<ProductCategory>().GetByIdAsync(product.CategoryId);
+        ProductCategory? category = await _unitOfWork.Repository<ProductCategory>().GetByIdAsync(product.CategoryId);
         if (category is null)
             return Result<productResponse>.Failure(CategoryErrors.NotFoundCate);
 
-        var brand = await _unitOfWork.Repository<ProductBrand>().GetByIdAsync(product.BrandId);
+        ProductBrand? brand = await _unitOfWork.Repository<ProductBrand>().GetByIdAsync(product.BrandId);
         if (brand is null)
             return Result<productResponse>.Failure(BrandErrors.NotFoundBrand);
 
-        var newProduct = product.Adapt<Product>();
+        Product? newProduct = new Product(
+            product.Name,
+            product.Description,
+            product.PictureUrl,
+            product.Price,
+            product.BrandId,
+            product.CategoryId,
+            product.Stock
+        );
         var createdProduct = await _unitOfWork.Repository<Product>().AddAsync(newProduct);
         await _unitOfWork.CompleteAsync();
 
-        var result = await GetProductById(createdProduct.Id);
+        Result<productResponse>? result = await GetProductById(createdProduct.Id);
 
         return Result<productResponse>.Success(result.Value);
 
@@ -59,18 +67,22 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
     public async Task<Result<productResponse>> UpdateProduct(int id, ProductRequest request)
     {
        
-        var exists = await _unitOfWork.Repository<Product>().GetCountAsync(new ProductsByNameAndIdSpec(request.Name , id));
+        int exists = await _unitOfWork.Repository<Product>().GetCountAsync(new ProductsByNameAndIdSpec(request.Name , id));
         if (exists > 0)
             return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
-        var Spec = new ProductSpecWithBrandAndCategory(id);
-        var product = await _unitOfWork.Repository<Product>().GetByIdWithSpecAsync(Spec);
+        ProductSpecWithBrandAndCategory? Spec = new ProductSpecWithBrandAndCategory(id);
+        Product? product = await _unitOfWork.Repository<Product>().GetByIdWithSpecAsync(Spec);
         if (product is not null)
         {
             product.Name = request.Name;
+            product.Description = request.Description;
             product.Price = request.Price;
             product.BrandId = request.BrandId;
             product.CategoryId = request.CategoryId;
             product.PictureUrl = request.PictureUrl;
+            
+            product.UpdateStock(request.Stock);
+
             _unitOfWork.Repository<Product>().Update(product);
             await _unitOfWork.CompleteAsync();
             return Result<productResponse>.Success(product.Adapt<productResponse>());
@@ -81,9 +93,9 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
     }
     public async Task<Result> DeleteProduct(int id)
     {
-        var Spec = new ProductSpecWithBrandAndCategory(id);
+        ProductSpecWithBrandAndCategory? Spec = new ProductSpecWithBrandAndCategory(id);
 
-        var result = await _unitOfWork.Repository<Product>().GetByIdWithSpecAsync(Spec);
+        Product? result = await _unitOfWork.Repository<Product>().GetByIdWithSpecAsync(Spec);
 
         if (result is null)
             return Result<bool>.Failure(ProductErrors.NotFoundProduct);

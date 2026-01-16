@@ -10,3 +10,4 @@ global using Microsoft.AspNetCore.Http;
 global using System.Security.Claims;
 global using StackExchange.Redis;
 global using System.Text.Json;
+global using System.Linq.Expressions;

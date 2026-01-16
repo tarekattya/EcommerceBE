@@ -1,4 +1,5 @@
 ﻿global using Ecommerce.Shared;
+global using Ecommerce.Shared.Dtos;
 
 global using Microsoft.AspNetCore.Identity;
 

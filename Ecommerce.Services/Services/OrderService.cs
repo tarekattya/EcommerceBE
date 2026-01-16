@@ -1,14 +1,15 @@
 ﻿
 namespace Ecommerce.Application;
 
-public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository) : IOrderService
+public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository, ICouponService couponService) : IOrderService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ICartRepository _cartRepository = cartRepository;
+    private readonly ICouponService _couponService = couponService;
 
-    public async Task<Result<OrderResponse>> GetOrderByIdAsync(int id )
+    public async Task<Result<OrderResponse>> GetOrderByIdAsync(int id, string? email = null)
     {
-        OrderSpecification orderSpecification = new OrderSpecification(id);
+        OrderSpecification orderSpecification = new OrderSpecification(id, email);
         Order? order = await _unitOfWork.Repository<Order>().GetByIdWithSpecAsync(orderSpecification);
         if (order is null)
             return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
@@ -69,6 +70,28 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
         }).ToList();
 
         decimal subtotal = items.Sum(item => item.Price * item.Quantity);
+        decimal discount = 0;
+
+        if (!string.IsNullOrEmpty(request.CouponCode))
+        {
+            var couponResult = await _couponService.ValidateAndApplyCouponAsync(request.CouponCode, subtotal, deliveryMethod.Cost, items);
+            if (couponResult.IsSuccess)
+            {
+                discount = couponResult.Value;
+                
+                // Increment Usage Count
+                var coupon = await _unitOfWork.Repository<Coupon>().GetByIdWithSpecAsync(new CouponByCodeSpec(request.CouponCode));
+                if (coupon != null)
+                {
+                    coupon.UsageCount++;
+                    _unitOfWork.Repository<Coupon>().Update(coupon);
+                }
+            }
+            else
+            {
+                return Result<OrderResponse>.Failure(couponResult.Error!);
+            }
+        }
 
         Order? newOrder = new Order(
             request.buyerEmail,
@@ -76,7 +99,9 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
             deliveryMethod,
             items,
             subtotal,
-            request.IsCOD
+            request.IsCOD,
+            request.CouponCode,
+            discount
         );
 
         await _unitOfWork.Repository<Order>().AddAsync(newOrder);
@@ -119,4 +144,6 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
 
         return Result<OrderResponse>.Success(order.Adapt<OrderResponse>());
     }
+
+
 }

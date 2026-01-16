@@ -5,6 +5,7 @@ public class BrandsController(IBrandService service) : ApiBaseController
 {
     private readonly IBrandService _service = service;
 
+    [Cached(600)]
     [HttpGet("")]
     public async Task<ActionResult<BrandResponse>> GetBrands()
     {
@@ -13,6 +14,7 @@ public class BrandsController(IBrandService service) : ApiBaseController
 
     }
 
+    [Cached(600)]
     [HttpGet("{id}")]
     public async Task<ActionResult<BrandResponse>> GetBrandById([FromRoute] int id)
     {

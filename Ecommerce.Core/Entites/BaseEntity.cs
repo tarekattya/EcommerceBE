@@ -14,6 +14,7 @@ namespace Ecommerce.Core;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? ModifiedBy { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         [JsonIgnore]
         private readonly List<IDomainEvent> _domainEvents = new();

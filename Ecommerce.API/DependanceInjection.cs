@@ -34,6 +34,11 @@ public static class DependanceInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddSingleton<ICacheService, CacheService>();
+        services.AddScoped<ICouponService, CouponService>();
+        services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IDomainEventHandler<OrderStockReleaseEvent>, OrderStockReleaseHandler>();
         services.AddScoped<IDomainEventHandler<OrderProcessingStartedEvent>, OrderProcessingStartedHandler>();

@@ -6,6 +6,7 @@ public class ProductsController(IProductService service) : ApiBaseController
 {
     private readonly IProductService _service = service;
 
+    [Cached(600)]
     [HttpGet("")]
     public async Task<ActionResult<Pagination<productResponse>>> GetAllProducts([FromQuery] ProductSpecParams specParams)
     {
@@ -14,6 +15,7 @@ public class ProductsController(IProductService service) : ApiBaseController
     }
 
 
+    [Cached(600)]
     [HttpGet("{id}")]
     public async Task<ActionResult<productResponse>> GetProductById([FromRoute] int id)
     {
@@ -40,7 +42,13 @@ public class ProductsController(IProductService service) : ApiBaseController
     {
         var product = await _service.DeleteProduct(id);
         return product.IsSuccess ? NoContent() : product.ToProblem();
-
     }
 
+    [Cached(3600)]
+    [HttpGet("filters")]
+    public async Task<ActionResult<ProductFiltersResponse>> GetProductFilters()
+    {
+        var result = await _service.GetProductFiltersAsync();
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
 }

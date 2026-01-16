@@ -5,14 +5,16 @@ public class CategoriesController(ICategoryService service) : ApiBaseController
 {
     private readonly ICategoryService _service = service;
 
+    [Cached(600)]
     [HttpGet("")]
-    public async Task<ActionResult> GetCategories()
+    public async Task<ActionResult<Pagination<CategoryResponse>>> GetCategories()
     {
         var categories = await _service.GetCategories();
         return categories.IsSuccess ? Ok(categories.Value) : categories.ToProblem();
     }
+    [Cached(600)]
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetCategoryById(int id)
+    public async Task<ActionResult<CategoryResponse>> GetCategoryById([FromRoute] int id)
     {
         var category = await _service.GetCategoryById(id);
         return category.IsSuccess ? Ok(category.Value) : category.ToProblem();

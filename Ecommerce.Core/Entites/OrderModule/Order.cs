@@ -1,7 +1,7 @@
 ﻿namespace Ecommerce.Core;
 public class Order : BaseEntity
 {
-    public Order(string buyerEmail, OrderAddress shipingAddress, DeliveryMethod deliveryMethod, ICollection<OrderItem> items, decimal subTotal, bool isCOD = false)
+    public Order(string buyerEmail, OrderAddress shipingAddress, DeliveryMethod deliveryMethod, ICollection<OrderItem> items, decimal subTotal, bool isCOD = false, string? couponCode = null, decimal discount = 0)
     {
         BuyerEmail = buyerEmail;
         ShipingAddress = shipingAddress;
@@ -9,6 +9,8 @@ public class Order : BaseEntity
         Items = items;
         SubTotal = subTotal;
         IsCOD = isCOD;
+        CouponCode = couponCode;
+        Discount = discount;
     }
 
     public Order()
@@ -27,6 +29,9 @@ public class Order : BaseEntity
     public ICollection<OrderItem> Items { get; private set; } = new HashSet<OrderItem>();
 
     public decimal SubTotal { get; private set; }
+
+    public string? CouponCode { get; private set; }
+    public decimal Discount { get; private set; }
 
     public bool IsCOD { get; private set; }
 
@@ -99,6 +104,6 @@ public class Order : BaseEntity
     }
 
     public decimal GetTotal() =>
-        SubTotal + DeliveryMethod.Cost;
+        SubTotal + DeliveryMethod.Cost - Discount;
 
 }

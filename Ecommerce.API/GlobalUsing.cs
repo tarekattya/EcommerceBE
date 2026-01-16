@@ -3,6 +3,7 @@
 global using Ecommerce.Infrastructure;
 global using Ecommerce.Application;
 global using Ecommerce.Shared;
+global using Ecommerce.Shared.Dtos;
 global using Ecommerce.Core;
 
 global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;

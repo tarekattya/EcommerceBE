@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsdbin/
 obj/
+/Ecommerce.API/Ecommerce.db
+/Ecommerce.API/Ecommerce.db-shm
+/Ecommerce.API/Ecommerce.db-wal

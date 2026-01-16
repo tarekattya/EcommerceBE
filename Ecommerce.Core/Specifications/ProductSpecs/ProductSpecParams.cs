@@ -3,7 +3,7 @@ namespace Ecommerce.Core;
 
     public record ProductSpecParams
     {
-        private const int MaxPageSize = 10;
+        private const int MaxPageSize = 50;
         private int? _pageSize;
         private int? _pageIndex;
         private string? _search;
@@ -11,6 +11,8 @@ namespace Ecommerce.Core;
         public string? Sort { get; init; }
         public int? BrandId { get; init; }
         public int? CategoryId { get; init; }
+        public decimal? MinPrice { get; init; }
+        public decimal? MaxPrice { get; init; }
 
         public int pageIndex
         {
@@ -20,7 +22,7 @@ namespace Ecommerce.Core;
 
         public int PageSize
         {
-            get => _pageSize.HasValue && _pageSize.Value > 0 ? Math.Min(_pageSize.Value, MaxPageSize) : MaxPageSize;
+            get => _pageSize.HasValue && _pageSize.Value > 0 ? Math.Min(_pageSize.Value, MaxPageSize) : 20;
             init => _pageSize = value;
         }
 

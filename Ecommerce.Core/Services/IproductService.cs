@@ -13,5 +13,7 @@
 
         public Task<Result> DeleteProduct(int id);
 
+        public Task<Result<ProductFiltersResponse>> GetProductFiltersAsync();
+
     }
 

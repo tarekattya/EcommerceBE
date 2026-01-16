@@ -1,8 +1,9 @@
 ﻿namespace Ecommerce.Application;
 
-public class BrandService(IUnitOfWork unitOfWork) : IBrandService
+public class BrandService(IUnitOfWork unitOfWork, ICacheService cacheService) : IBrandService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly ICacheService _cacheService = cacheService;
 
     public async Task<Result<IReadOnlyList<BrandResponse>>> GetBrands()
     {
@@ -34,6 +35,8 @@ public class BrandService(IUnitOfWork unitOfWork) : IBrandService
             return Result<BrandResponse>.Failure(BrandErrors.CantCreateBrand);
         await _unitOfWork.CompleteAsync();
 
+        await _cacheService.RemoveCacheByPrefixAsync("/api/brands");
+
         return Result<BrandResponse>.Success(createdBrand.Adapt<BrandResponse>());
 
     }
@@ -49,6 +52,9 @@ public class BrandService(IUnitOfWork unitOfWork) : IBrandService
         existingBrand.Name = brand.Name;
          _unitOfWork.Repository<ProductBrand>().Update(existingBrand);
         await _unitOfWork.CompleteAsync(); 
+        
+        await _cacheService.RemoveCacheByPrefixAsync("/api/brands");
+
         return Result.Success();
 
     }
@@ -65,6 +71,9 @@ public class BrandService(IUnitOfWork unitOfWork) : IBrandService
 
         _unitOfWork.Repository<ProductBrand>().Delete(existingBrand);
         await _unitOfWork.CompleteAsync();
+
+        await _cacheService.RemoveCacheByPrefixAsync("/api/brands");
+
         return Result.Success();
 
     }

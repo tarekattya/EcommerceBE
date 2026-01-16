@@ -1,8 +1,9 @@
 ﻿namespace Ecommerce.Application;
 
-public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
+public class CategoryService(IUnitOfWork unitOfWork, ICacheService cacheService) : ICategoryService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly ICacheService _cacheService = cacheService;
 
     public async Task<Result<IReadOnlyList<CategoryResponse>>> GetCategories()
     {
@@ -28,6 +29,9 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
         if (result is null)
             return Result<CategoryResponse>.Failure(CategoryErrors.CantCreateCategory);
         await _unitOfWork.CompleteAsync();
+        
+        await _cacheService.RemoveCacheByPrefixAsync("/api/categories");
+
         return Result<CategoryResponse>.Success(result.Adapt<CategoryResponse>());
     }
     public async Task<Result> UpdateCategory(int id, CategoryRequest category)
@@ -41,6 +45,9 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
         existingCategory.Name = category.Name;
          _unitOfWork.Repository<ProductCategory>().Update(existingCategory);
        await _unitOfWork.CompleteAsync();
+
+        await _cacheService.RemoveCacheByPrefixAsync("/api/categories");
+
         return Result.Success();
     }
     public async Task<Result> DeleteCategory(int id)
@@ -54,6 +61,9 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
             return Result.Failure(CategoryErrors.NotFoundCate);
         _unitOfWork.Repository <ProductCategory>().Delete(existingCategory);
         await _unitOfWork.CompleteAsync();
+
+        await _cacheService.RemoveCacheByPrefixAsync("/api/categories");
+
         return Result.Success();
     }
 }

@@ -40,7 +40,13 @@ public class Config
             .Map(dest => dest.DeliveryMethodName, src => src.DeliveryMethod.ShortName)
             .Map(dest => dest.Items, src => src.Items)
             .Map(dest => dest.OrderStatus, src => GetEnumMemberValue(src.Status))
-            .Map(dest => dest.Total, src => src.GetTotal());
+            .Map(dest => dest.Total, src => src.GetTotal())
+            .Map(dest => dest.CouponCode, src => src.CouponCode)
+            .Map(dest => dest.Discount, src => src.Discount);
+
+        config.NewConfig<Coupon, CouponResponse>()
+            .Map(dest => dest.DiscountType, src => (DiscountTypeDto)src.DiscountType);
+
         TypeAdapterConfig<OrderItem, OrderItemResponse>.NewConfig()
             .Map(dest => dest.ProductId, src => src.ProductItemOrderd.ProductId)
             .Map(dest => dest.ProductName, src => src.ProductItemOrderd.Name)

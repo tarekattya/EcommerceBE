@@ -3,9 +3,10 @@ using Ecommerce.Shared;
 
 namespace Ecommerce.Application;
 
-public class ProductService(IUnitOfWork unitOfWork) : IProductService
+public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService) : IProductService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly ICacheService _cacheService = cacheService;
 
     public async Task<Result<Pagination<productResponse>>> GetAllAsync(ProductSpecParams specParams)
     {
@@ -60,6 +61,8 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
 
         Result<productResponse>? result = await GetProductById(createdProduct.Id);
 
+        await _cacheService.RemoveCacheByPrefixAsync("/api/products");
+
         return Result<productResponse>.Success(result.Value);
 
     }
@@ -85,6 +88,9 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
 
             _unitOfWork.Repository<Product>().Update(product);
             await _unitOfWork.CompleteAsync();
+
+            await _cacheService.RemoveCacheByPrefixAsync("/api/products");
+
             return Result<productResponse>.Success(product.Adapt<productResponse>());
 
         }
@@ -103,7 +109,32 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         _unitOfWork.Repository<Product>().Delete(result);
         await _unitOfWork.CompleteAsync();
 
+        await _cacheService.RemoveCacheByPrefixAsync("/api/products");
+
         return Result.Success();
+    }
+
+    public async Task<Result<ProductFiltersResponse>> GetProductFiltersAsync()
+    {
+        var products = await _unitOfWork.Repository<Product>().GetAllAsync();
+        var brands = await _unitOfWork.Repository<ProductBrand>().GetAllAsync();
+        var categories = await _unitOfWork.Repository<ProductCategory>().GetAllAsync();
+
+        var brandFilters = brands.Select(b => new FilterItemResponse(
+            b.Id,
+            b.Name,
+            products.Count(p => p.BrandId == b.Id)
+        )).ToList();
+
+        var categoryFilters = categories.Select(c => new FilterItemResponse(
+            c.Id,
+            c.Name,
+            products.Count(p => p.CategoryId == c.Id)
+        )).ToList();
+
+        var maxPrice = products.Any() ? products.Max(p => p.Price) : 0;
+
+        return Result<ProductFiltersResponse>.Success(new ProductFiltersResponse(brandFilters, categoryFilters, maxPrice));
     }
 }
 

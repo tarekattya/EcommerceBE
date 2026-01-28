@@ -49,10 +49,19 @@ public class CouponService(IUnitOfWork unitOfWork) : ICouponService
         return Result.Success();
     }
 
-    public async Task<Result<IReadOnlyList<CouponResponse>>> GetAllCouponsAsync()
+    public async Task<Result<Pagination<CouponResponse>>> GetAllCouponsAsync(CouponSpecParams specParams)
     {
-        var coupons = await _unitOfWork.Repository<Coupon>().GetAllAsync();
-        return Result<IReadOnlyList<CouponResponse>>.Success(coupons.Adapt<IReadOnlyList<CouponResponse>>());
+        var spec = new CouponWithSearchSpec(specParams);
+        var countSpec = new CouponCountSpec(specParams);
+
+        var coupons = await _unitOfWork.Repository<Coupon>().GetAllWithSpecAsync(spec);
+        var count = await _unitOfWork.Repository<Coupon>().GetCountAsync(countSpec);
+
+        if (coupons == null)
+            return Result<Pagination<CouponResponse>>.Failure(new Error("Coupon.NotFound", "No coupons found", StatusCodes.Status404NotFound));
+
+        var data = coupons.Adapt<IReadOnlyList<CouponResponse>>();
+        return Result<Pagination<CouponResponse>>.Success(new Pagination<CouponResponse>(specParams.PageIndex, specParams.PageSize, count, data));
     }
 
     public async Task<Result<decimal>> ValidateAndApplyCouponAsync(string code, decimal currentOrderAmount, decimal shippingCost = 0, IEnumerable<OrderItem>? items = null)

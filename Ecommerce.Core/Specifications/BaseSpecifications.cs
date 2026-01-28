@@ -1,10 +1,11 @@
-﻿
+
 namespace Ecommerce.Core;
 
     public class BaseSpecifications<T> : ISpecification<T> where T : BaseEntity
     {
         public Expression<Func<T, bool>>? Criteria { get; set; } = null;
         public List<Expression<Func<T, object>>> Includes { get; set; } = new List<Expression<Func<T, object>>>();
+        public List<string> IncludeStrings { get; set; } = new List<string>();
         public Expression<Func<T, object>>? OrderBy { get; set; }
         public Expression<Func<T, object>>? OrderByDesc { get; set; }
         public int Skip { get; set; }
@@ -34,6 +35,11 @@ namespace Ecommerce.Core;
             IsEnablerPagination = true;
             Skip = skip;
             Take = take;
+        }
+
+        protected void AddInclude(string includeString)
+        {
+            IncludeStrings.Add(includeString);
         }
 
     }

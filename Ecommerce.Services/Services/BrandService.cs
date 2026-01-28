@@ -5,13 +5,19 @@ public class BrandService(IUnitOfWork unitOfWork, ICacheService cacheService) : 
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ICacheService _cacheService = cacheService;
 
-    public async Task<Result<IReadOnlyList<BrandResponse>>> GetBrands()
+    public async Task<Result<Pagination<BrandResponse>>> GetBrands(BrandSpecParams specParams)
     {
-        var result = await _unitOfWork.Repository<ProductBrand>().GetAllAsync();
-        if (result is null)
-            return Result<IReadOnlyList<BrandResponse>>.Failure(BrandErrors.NotFoundBrand);
+        var spec = new BrandWithSearchSpec(specParams);
+        var countSpec = new BrandCountSpec(specParams);
+        
+        var brands = await _unitOfWork.Repository<ProductBrand>().GetAllWithSpecAsync(spec);
+        var count = await _unitOfWork.Repository<ProductBrand>().GetCountAsync(countSpec);
 
-        return Result<IReadOnlyList<BrandResponse>>.Success(result.Adapt<IReadOnlyList<BrandResponse>>());
+        if (brands is null)
+            return Result<Pagination<BrandResponse>>.Failure(BrandErrors.NotFoundBrand);
+
+        var data = brands.Adapt<IReadOnlyList<BrandResponse>>();
+        return Result<Pagination<BrandResponse>>.Success(new Pagination<BrandResponse>(specParams.PageIndex, specParams.PageSize, count, data));
     }
 
 

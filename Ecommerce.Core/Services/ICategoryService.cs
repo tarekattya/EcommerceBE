@@ -2,7 +2,7 @@
 
 public interface ICategoryService
 {
-    public Task<Result<IReadOnlyList<CategoryResponse>>> GetCategories();
+    public Task<Result<Pagination<CategoryResponse>>> GetCategories(CategorySpecParams specParams);
 
     public Task<Result<CategoryResponse>> GetCategoryById(int id);
 

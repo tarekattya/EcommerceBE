@@ -7,9 +7,9 @@ public class CategoriesController(ICategoryService service) : ApiBaseController
 
     [Cached(600)]
     [HttpGet("")]
-    public async Task<ActionResult<Pagination<CategoryResponse>>> GetCategories()
+    public async Task<ActionResult<Pagination<CategoryResponse>>> GetCategories([FromQuery] CategorySpecParams specParams)
     {
-        var categories = await _service.GetCategories();
+        var categories = await _service.GetCategories(specParams);
         return categories.IsSuccess ? Ok(categories.Value) : categories.ToProblem();
     }
     [Cached(600)]

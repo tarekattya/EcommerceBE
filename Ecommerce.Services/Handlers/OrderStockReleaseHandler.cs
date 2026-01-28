@@ -8,10 +8,10 @@ public class OrderStockReleaseHandler(IUnitOfWork unitOfWork) : IDomainEventHand
     {
         foreach (var item in domainEvent.Items)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(item.ProductItemOrderd.ProductId);
+            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(item.ProductItemOrderd.ProductId);
             if (product != null)
             {
-                var result = product.Restock(item.Quantity);
+                Result? result = product.Restock(item.Quantity);
                 if (result.IsSuccess)
                 {
                     _unitOfWork.Repository<Product>().Update(product);

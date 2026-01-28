@@ -5,12 +5,19 @@ public class CategoryService(IUnitOfWork unitOfWork, ICacheService cacheService)
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ICacheService _cacheService = cacheService;
 
-    public async Task<Result<IReadOnlyList<CategoryResponse>>> GetCategories()
+    public async Task<Result<Pagination<CategoryResponse>>> GetCategories(CategorySpecParams specParams)
     {
-        var result = await _unitOfWork.Repository<ProductCategory>().GetAllAsync();
+        var spec = new CategoryWithSearchSpec(specParams);
+        var countSpec = new CategoryCountSpec(specParams);
+
+        var result = await _unitOfWork.Repository<ProductCategory>().GetAllWithSpecAsync(spec);
+        var count = await _unitOfWork.Repository<ProductCategory>().GetCountAsync(countSpec);
+
         if (result is null)
-            return Result<IReadOnlyList<CategoryResponse>>.Failure(CategoryErrors.NotFoundCate);
-        return Result<IReadOnlyList<CategoryResponse>>.Success(result.Adapt<IReadOnlyList<CategoryResponse>>());
+            return Result<Pagination<CategoryResponse>>.Failure(CategoryErrors.NotFoundCate);
+
+        var response = result.Adapt<IReadOnlyList<CategoryResponse>>();
+        return Result<Pagination<CategoryResponse>>.Success(new Pagination<CategoryResponse>(specParams.PageIndex, specParams.PageSize, count, response));
     }
     public async Task<Result<CategoryResponse>> GetCategoryById(int id)
     {

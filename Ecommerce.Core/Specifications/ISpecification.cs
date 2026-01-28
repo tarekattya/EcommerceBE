@@ -1,4 +1,4 @@
-﻿
+
 namespace Ecommerce.Core;
 
     public interface ISpecification<T> where T : BaseEntity
@@ -6,6 +6,11 @@ namespace Ecommerce.Core;
         public Expression<Func<T , bool>>? Criteria { get; set; }
 
         public List<Expression<Func<T, object>>> Includes { get; set; }
+        
+        /// <summary>
+        /// String-based includes for nested navigation properties (e.g., "Product.Brand")
+        /// </summary>
+        public List<string> IncludeStrings { get; set; }
 
         public Expression<Func<T , object>>? OrderBy { get; set; }
         public Expression<Func<T , object>>? OrderByDesc { get; set; }

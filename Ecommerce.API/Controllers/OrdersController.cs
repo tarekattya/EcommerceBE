@@ -37,12 +37,12 @@ public class OrdersController(IOrderService orderService) : ApiBaseController
     }
 
     [HttpGet("my-orders")]
-    public async Task<IActionResult> GetOrdersForUserAsync()
+    public async Task<IActionResult> GetOrdersForUserAsync([FromQuery] OrderSpecParams specParams)
     {
         if (string.IsNullOrEmpty(UserEmail))
             return Unauthorized();
 
-        Result<IReadOnlyList<OrderResponse>>? result = await _orderService.GetOrdersForUserAsync(UserEmail);
+        var result = await _orderService.GetOrdersForUserAsync(UserEmail, specParams);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 

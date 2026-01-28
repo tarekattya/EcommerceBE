@@ -112,15 +112,20 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
     }
 
 
-    public async Task<Result<IReadOnlyList<OrderResponse>>> GetOrdersForUserAsync(string email)
+    public async Task<Result<Pagination<OrderResponse>>> GetOrdersForUserAsync(string email, OrderSpecParams specParams)
     {
-        OrdersByEmailSpec orderSpecification = new OrdersByEmailSpec(email);
+        OrdersByEmailSpec orderSpecification = new OrdersByEmailSpec(email, specParams);
+        OrdersWithFilterForCountSpec countSpec = new OrdersWithFilterForCountSpec(email, specParams);
+
         IReadOnlyList<Order> orders = await _unitOfWork.Repository<Order>().GetAllWithSpecAsync(orderSpecification);
-        
+        int totalItems = await _unitOfWork.Repository<Order>().GetCountAsync(countSpec);
+
         if (orders == null || !orders.Any())
-            return Result<IReadOnlyList<OrderResponse>>.Failure(OrderErrors.NotFoundOrder);
-        
-        return Result<IReadOnlyList<OrderResponse>>.Success(orders.Adapt<IReadOnlyList<OrderResponse>>());
+            return Result<Pagination<OrderResponse>>.Failure(OrderErrors.NotFoundOrder);
+
+        var data = orders.Adapt<IReadOnlyList<OrderResponse>>();
+
+        return Result<Pagination<OrderResponse>>.Success(new Pagination<OrderResponse>(specParams.PageIndex, specParams.PageSize, totalItems, data));
     }
 
     public async Task<Result<OrderResponse>> UpdateOrderStatusAsync(int orderId, UpdateOrderStatusRequest request)

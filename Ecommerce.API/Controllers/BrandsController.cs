@@ -7,11 +7,10 @@ public class BrandsController(IBrandService service) : ApiBaseController
 
     [Cached(600)]
     [HttpGet("")]
-    public async Task<ActionResult<BrandResponse>> GetBrands()
+    public async Task<ActionResult<Pagination<BrandResponse>>> GetBrands([FromQuery] BrandSpecParams specParams)
     {
-        var brands = await _service.GetBrands();
+        var brands = await _service.GetBrands(specParams);
         return brands.IsSuccess ? Ok(brands.Value) : brands.ToProblem();
-
     }
 
     [Cached(600)]

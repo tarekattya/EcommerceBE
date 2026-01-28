@@ -6,12 +6,12 @@ public class OrderProcessingStartedHandler(IUnitOfWork unitOfWork) : IDomainEven
 
     public async Task Handle(OrderProcessingStartedEvent domainEvent)
     {
-        foreach (var item in domainEvent.Order.Items)
+        foreach (OrderItem item in domainEvent.Order.Items)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(item.ProductItemOrderd.ProductId);
+            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(item.ProductItemOrderd.ProductId);
             if (product != null)
             {
-                var result = product.ReduceStock(item.Quantity);
+                Result? result = product.ReduceStock(item.Quantity);
                 if (result.IsSuccess)
                 {
                     _unitOfWork.Repository<Product>().Update(product);

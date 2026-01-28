@@ -36,7 +36,7 @@ namespace Ecommerce.Core;
             else 
                 AddOrderByDesc(p => p.CreatedAt);
 
-            ApplyPagination((specParams.pageIndex - 1) * specParams.PageSize, specParams.PageSize);
+            ApplyPagination((specParams.PageIndex - 1) * specParams.PageSize, specParams.PageSize);
         }
         public ProductSpecWithBrandAndCategory(int id) : base(p => p.Id == id)
         {

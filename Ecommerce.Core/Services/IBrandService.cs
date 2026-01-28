@@ -4,7 +4,7 @@ namespace Ecommerce.Core;
 
     public interface IBrandService
     {
-        public Task<Result<IReadOnlyList<BrandResponse>>> GetBrands();
+        public Task<Result<Pagination<BrandResponse>>> GetBrands(BrandSpecParams specParams);
 
         public Task<Result<BrandResponse>> GetBrandById(int id);
 

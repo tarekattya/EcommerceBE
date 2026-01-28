@@ -1,6 +1,5 @@
 ﻿namespace Ecommerce.API;
 
-[Authorize]
 public class AddressController(UserManager<ApplicationUser> userManager , ApplicationDbContext context) : ApiBaseController
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -9,7 +8,7 @@ public class AddressController(UserManager<ApplicationUser> userManager , Applic
     [HttpGet("")]
     public async Task<ActionResult> GetUserAddress(CancellationToken cancellationToken)
     {
-        var result = await _userManager.GetUserAddressAsync(User, cancellationToken);
+        Result<AddressResponse>? result = await _userManager.GetUserAddressAsync(User, cancellationToken);
 
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
@@ -17,9 +16,9 @@ public class AddressController(UserManager<ApplicationUser> userManager , Applic
     [HttpPut("")]
     public async Task<ActionResult<AddressResponse>> UpdateUserAddress(AddressRequest request, CancellationToken cancellationToken)
     {
-      var user = await _userManager.GetUserAsync(User, cancellationToken);
+      ApplicationUser? user = await _userManager.GetUserAsync(User, cancellationToken);
         if (user == null) return NotFound();
-        var newAddress = request.Adapt<Address>();
+        Address? newAddress = request.Adapt<Address>();
         if (user.Address is not null)
         {
             newAddress.Id = user.Address.Id;

@@ -7,7 +7,7 @@ public interface IOrderService
 
     Task<Result<OrderResponse>> GetOrderByIdAsync(int id, string? email = null);
 
-    Task<Result<IReadOnlyList<OrderResponse>>> GetOrdersForUserAsync(string email);
+    Task<Result<Pagination<OrderResponse>>> GetOrdersForUserAsync(string email, OrderSpecParams specParams);
 
     Task<Result<OrderResponse>> UpdateOrderStatusAsync(int orderId, UpdateOrderStatusRequest request);
 

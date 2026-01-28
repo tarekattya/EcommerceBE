@@ -5,9 +5,9 @@ public class CouponsController(ICouponService service) : ApiBaseController
     private readonly ICouponService _service = service;
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<CouponResponse>>> GetAll()
+    public async Task<ActionResult<Pagination<CouponResponse>>> GetAll([FromQuery] CouponSpecParams specParams)
     {
-        Result<IReadOnlyList<CouponResponse>>? result = await _service.GetAllCouponsAsync();
+        var result = await _service.GetAllCouponsAsync(specParams);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 

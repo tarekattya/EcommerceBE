@@ -1,38 +1,15 @@
-﻿
-namespace Ecommerce.Core;
+﻿namespace Ecommerce.Core;
 
-    public record ProductSpecParams
+    public record ProductSpecParams : BaseSpecParams
     {
-        private const int MaxPageSize = 50;
-        private int? _pageSize;
-        private int? _pageIndex;
-        private string? _search;
-
-        public string? Sort { get; init; }
         public int? BrandId { get; init; }
         public int? CategoryId { get; init; }
         public decimal? MinPrice { get; init; }
         public decimal? MaxPrice { get; init; }
 
-        public int pageIndex
+        public override int PageSize
         {
-            get => _pageIndex.HasValue && _pageIndex.Value > 0 ? _pageIndex.Value : 1;
-            init => _pageIndex = value;
-        }
-
-        public int PageSize
-        {
-            get => _pageSize.HasValue && _pageSize.Value > 0 ? Math.Min(_pageSize.Value, MaxPageSize) : 20;
-            init => _pageSize = value;
-        }
-
-        public string? Search
-        {
-            get => _search;
-            init => _search = value?.ToLower();
+            get => base.PageSize == 10 ? 20 : base.PageSize; // Maintain the old default of 20
+            init => base.PageSize = value;
         }
     }
-
-
-
-

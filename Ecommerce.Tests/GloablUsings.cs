@@ -1,0 +1,12 @@
+global using Moq;
+global using Ecommerce.Application;
+global using Ecommerce.Core;
+global using Ecommerce.Infrastructure;
+global using Microsoft.Extensions.Options;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Http;
+global using FluentAssertions;
+global using Xunit.Abstractions;
+global using System.Net.Http.Json;
+global using System.Diagnostics;

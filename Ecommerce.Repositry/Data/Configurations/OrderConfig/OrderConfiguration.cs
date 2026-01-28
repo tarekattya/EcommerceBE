@@ -1,4 +1,4 @@
-﻿
+
 namespace Ecommerce.Infrastructure;
 internal class OrderConfiguration : IEntityTypeConfiguration<Core.Order>
 {
@@ -12,5 +12,11 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Core.Order>
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
 
+        // Performance: Add indexes on frequently queried columns
+        builder.HasIndex(e => e.Status);
+        builder.HasIndex(e => e.IsDeleted);
+        builder.HasIndex(e => e.OrderDate);
+        // Composite index for common query pattern: Status + IsDeleted
+        builder.HasIndex(e => new { e.Status, e.IsDeleted });
     }
 }

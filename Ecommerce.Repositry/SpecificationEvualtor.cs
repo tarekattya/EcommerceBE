@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Infrastructure;
+namespace Ecommerce.Infrastructure;
 
 public static class SpecificationEvaluator<T> where T : BaseEntity
 {
@@ -22,6 +22,12 @@ public static class SpecificationEvaluator<T> where T : BaseEntity
         if (spec.Includes != null && spec.Includes.Any())
         {
             query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
+        }
+
+        // Apply string-based includes for nested navigation properties
+        if (spec.IncludeStrings != null && spec.IncludeStrings.Any())
+        {
+            query = spec.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
         }
 
         return query;

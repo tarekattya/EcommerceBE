@@ -1,4 +1,4 @@
-﻿
+
 namespace Ecommerce.Infrastructure;
 
 internal class ProductConfuguration : IEntityTypeConfiguration<Product>
@@ -30,6 +30,9 @@ internal class ProductConfuguration : IEntityTypeConfiguration<Product>
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.NoAction);
 
+        // Performance: Add index on Stock for low stock queries
+        builder.HasIndex(p => p.Stock);
+        builder.HasIndex(p => p.IsDeleted);
 
     }
 }

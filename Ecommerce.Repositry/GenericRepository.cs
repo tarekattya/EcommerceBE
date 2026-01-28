@@ -13,7 +13,7 @@ public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepo
     
     public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec)
     {
-        var data = await ApplaySpecifications(spec)
+        List<T>? data = await ApplaySpecifications(spec)
             .AsNoTracking()
             .ToListAsync();
         if (data is null || !data.Any())
@@ -25,7 +25,7 @@ public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepo
     }
     public async Task<T?> GetByIdWithSpecAsync(ISpecification<T> spec)
     {
-        var singledata = await ApplaySpecifications(spec)
+        T? singledata = await ApplaySpecifications(spec)
             .FirstOrDefaultAsync();
         if (singledata is null)
             return null!;

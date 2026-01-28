@@ -1,4 +1,4 @@
-﻿
+
 
 namespace Ecommerce.Infrastructure;
 
@@ -96,10 +96,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Core.Order> Orders { get; set; } = default!;
     public DbSet<OrderItem> OrderItems { get; set; } = default!;
     public DbSet<DeliveryMethod> DeliveryMethods { get; set; } = default!;
-
-    
     public DbSet<RefreshToken> RefreshTokens { get; set; } = default!;
     public DbSet<Coupon> Coupons { get; set; } = default!;
+    public DbSet<WishlistItem> WishlistItems { get; set; } = default!;
+    public DbSet<ProductRating> ProductRatings { get; set; } = default!;
 
 
 

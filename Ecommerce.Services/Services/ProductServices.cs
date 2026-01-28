@@ -1,12 +1,12 @@
-﻿
-using Ecommerce.Shared;
+﻿using Ecommerce.Shared;
 
 namespace Ecommerce.Application;
 
-public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService) : IProductService
+public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService, IFileService fileService) : IProductService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ICacheService _cacheService = cacheService;
+    private readonly IFileService _fileService = fileService;
 
     public async Task<Result<Pagination<productResponse>>> GetAllAsync(ProductSpecParams specParams)
     {
@@ -20,7 +20,7 @@ public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService) 
 
         var response = result.Adapt<IReadOnlyList<productResponse>>();
 
-        return Result<Pagination<productResponse>>.Success(new Pagination<productResponse>(specParams.pageIndex, specParams.PageSize, count, response));
+        return Result<Pagination<productResponse>>.Success(new Pagination<productResponse>(specParams.PageIndex, specParams.PageSize, count, response));
     }
     public async Task<Result<productResponse>> GetProductById(int id)
     {
@@ -34,11 +34,12 @@ public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService) 
         return product is not null ? Result<productResponse>.Success(product) : Result<productResponse>.Failure(ProductErrors.NotFoundProduct);
 
     }
-    public async Task<Result<productResponse>> CreateProduct(ProductRequest product)
+    public async Task<Result<productResponse>> CreateProduct(ProductRequest product, IFormFile? image)
     {
         var exists = await _unitOfWork.Repository<Product>().GetCountAsync(new ProductsByNameSpec(product.Name));
         if (exists > 0)
             return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
+
         ProductCategory? category = await _unitOfWork.Repository<ProductCategory>().GetByIdAsync(product.CategoryId);
         if (category is null)
             return Result<productResponse>.Failure(CategoryErrors.NotFoundCate);
@@ -47,10 +48,16 @@ public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService) 
         if (brand is null)
             return Result<productResponse>.Failure(BrandErrors.NotFoundBrand);
 
+        var pictureUrl = product.PictureUrl;
+        if (image != null)
+        {
+            pictureUrl = await _fileService.UploadFileAsync(image, "products");
+        }
+
         Product? newProduct = new Product(
             product.Name,
             product.Description,
-            product.PictureUrl,
+            pictureUrl ?? string.Empty, 
             product.Price,
             product.BrandId,
             product.CategoryId,
@@ -67,22 +74,37 @@ public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService) 
 
     }
 
-    public async Task<Result<productResponse>> UpdateProduct(int id, ProductRequest request)
+    public async Task<Result<productResponse>> UpdateProduct(int id, ProductRequest request, IFormFile? image)
     {
-       
         int exists = await _unitOfWork.Repository<Product>().GetCountAsync(new ProductsByNameAndIdSpec(request.Name , id));
         if (exists > 0)
             return Result<productResponse>.Failure(ProductErrors.ProductNameAlreadyExists);
+
         ProductSpecWithBrandAndCategory? Spec = new ProductSpecWithBrandAndCategory(id);
         Product? product = await _unitOfWork.Repository<Product>().GetByIdWithSpecAsync(Spec);
+
+        if (product == null)
+            return Result<productResponse>.Failure(ProductErrors.NotFoundProduct);
+
+        var pictureUrl = request.PictureUrl;
+        if (image != null)
+        {
+            pictureUrl = await _fileService.UploadFileAsync(image, "products");
+        }
+        
         if (product is not null)
         {
+            if (!string.IsNullOrEmpty(product.PictureUrl) && product.PictureUrl != pictureUrl && product.PictureUrl.StartsWith("images/"))
+            {
+                _fileService.DeleteFile(product.PictureUrl, "");
+            }
+
             product.Name = request.Name;
             product.Description = request.Description;
             product.Price = request.Price;
             product.BrandId = request.BrandId;
             product.CategoryId = request.CategoryId;
-            product.PictureUrl = request.PictureUrl;
+            product.PictureUrl = pictureUrl ?? string.Empty;
             
             product.UpdateStock(request.Stock);
 
@@ -105,6 +127,12 @@ public class ProductService(IUnitOfWork unitOfWork, ICacheService cacheService) 
 
         if (result is null)
             return Result<bool>.Failure(ProductErrors.NotFoundProduct);
+
+        // Delete image from server if it exists
+        if (!string.IsNullOrEmpty(result.PictureUrl) && result.PictureUrl.StartsWith("images/"))
+        {
+            _fileService.DeleteFile(result.PictureUrl, "");
+        }
 
         _unitOfWork.Repository<Product>().Delete(result);
         await _unitOfWork.CompleteAsync();

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.Serialization;
 using Ecommerce.Shared;
 
@@ -51,6 +51,22 @@ public class Config
             .Map(dest => dest.ProductId, src => src.ProductItemOrderd.ProductId)
             .Map(dest => dest.ProductName, src => src.ProductItemOrderd.Name)
             .Map(dest => dest.PictureUrl, src => src.ProductItemOrderd.PictureUrl);
+
+        // Wishlist mappings
+        config.NewConfig<WishlistItem, WishlistItemResponse>()
+            .Map(dest => dest.ProductName, src => src.Product.Name)
+            .Map(dest => dest.PictureUrl, 
+                 src => string.IsNullOrEmpty(src.Product.PictureUrl)
+                        ? null
+                        : $"{baseUrl}/{src.Product.PictureUrl.TrimStart('/')}")
+            .Map(dest => dest.Price, src => src.Product.Price)
+            .Map(dest => dest.Brand, src => src.Product.Brand.Name)
+            .Map(dest => dest.Category, src => src.Product.Category.Name)
+            .Map(dest => dest.AddedAt, src => src.CreatedAt);
+
+        // Rating mappings
+        config.NewConfig<ProductRating, RatingResponse>()
+            .Map(dest => dest.ProductName, src => src.Product.Name);
     }
 
 }

@@ -366,3 +366,4 @@ obj/
 /Ecommerce.API/Ecommerce.db-shm
 /Ecommerce.API/Ecommerce.db-wal
 /Ecommerce.API/.db
+/PRODUCTION_READINESS.md

@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Blazor", "Ecommer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Blazor.Client", "Ecommerce.Blazor\Ecommerce.Blazor.Client\Ecommerce.Blazor.Client.csproj", "{5310F4B4-3DF9-45E2-88BC-627BE319340A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecommerce.Tests", "Ecommerce.Tests\Ecommerce.Tests.csproj", "{896C007B-56A7-4C01-89A3-63ACFA5C43B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,18 @@ Global
 		{5310F4B4-3DF9-45E2-88BC-627BE319340A}.Release|x64.Build.0 = Release|Any CPU
 		{5310F4B4-3DF9-45E2-88BC-627BE319340A}.Release|x86.ActiveCfg = Release|Any CPU
 		{5310F4B4-3DF9-45E2-88BC-627BE319340A}.Release|x86.Build.0 = Release|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Debug|x64.Build.0 = Debug|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Debug|x86.Build.0 = Debug|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Release|x64.ActiveCfg = Release|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Release|x64.Build.0 = Release|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Release|x86.ActiveCfg = Release|Any CPU
+		{896C007B-56A7-4C01-89A3-63ACFA5C43B0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

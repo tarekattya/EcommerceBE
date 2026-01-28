@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Converters;
 using Ecommerce.Core;
 using Ecommerce.Services;
 using Ecommerce.Application;
@@ -11,6 +11,17 @@ public static class DependanceInjection
    
     public static IServiceCollection AddApplicationServices(this IServiceCollection services ,IConfiguration configuration,WebApplicationBuilder webApplication)
     {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin", policy =>
+            {
+                policy.WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>() ?? new[] { "https://localhost:7021" })
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials();
+            });
+        });
+
         services.AddControllers()
             .AddNewtonsoftJson(options =>
             {
@@ -38,10 +49,13 @@ public static class DependanceInjection
         services.AddScoped<IEmailService, EmailService>();
         services.AddSingleton<ICacheService, CacheService>();
         services.AddScoped<ICouponService, CouponService>();
+        services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<IRatingService, RatingService>();
         services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IDomainEventHandler<OrderStockReleaseEvent>, OrderStockReleaseHandler>();
         services.AddScoped<IDomainEventHandler<OrderProcessingStartedEvent>, OrderProcessingStartedHandler>();
+        services.AddScoped<IFileService, FileService>();
 
         return services;
     }
@@ -118,7 +132,28 @@ public static class DependanceInjection
                 ValidIssuer = jwtSettings.Issuer,
                 ValidAudience = jwtSettings.Audience
             };
-            });
+            
+            o.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+            {
+                OnChallenge = context =>
+                {
+                    context.HandleResponse();
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    
+                    var errorResponse = new Error("Unauthorized", "Authentication failed. Please provide a valid token.", StatusCodes.Status401Unauthorized);
+                    var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    var json = JsonSerializer.Serialize(errorResponse, options);
+                    
+                    return context.Response.WriteAsync(json);
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                }
+            };
+        });
 
         return services;
     }

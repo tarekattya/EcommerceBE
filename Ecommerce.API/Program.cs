@@ -23,10 +23,17 @@ public class Program
                 op.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
         }
-        app.UseStatusCodePagesWithReExecute("/Errors/{0}");
         app.UseHttpsRedirection();
 
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseCors("AllowSpecificOrigin");
+        }
+
+        app.UseAuthentication();
         app.UseAuthorization();
+        
+        app.UseStatusCodePagesWithReExecute("/Errors/{0}");
         app.UseStaticFiles();
 
         app.MapControllers();

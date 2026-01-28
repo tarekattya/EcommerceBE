@@ -1,5 +1,6 @@
-﻿namespace Ecommerce.API;
+namespace Ecommerce.API;
 [ApiExplorerSettings(IgnoreApi = true)]
+[AllowAnonymous]
 public class ErrorsController : ApiBaseController
 {
     public ActionResult Error(int code)

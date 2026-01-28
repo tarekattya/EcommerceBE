@@ -1,8 +1,4 @@
-﻿
-
-using Ecommerce.Shared;
-
-namespace Ecommerce.API;
+﻿ namespace Ecommerce.API;
 
 public static class UserManagerExtension
 {
@@ -11,7 +7,7 @@ public static class UserManagerExtension
         var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null) return
            Result<AddressResponse>.Failure(AuthErrors.InvalidCredentials);
-        var user = await userManager.Users.Include(u => u.Address).FirstAsync(u => u.Id == userId);
+        ApplicationUser? user = await userManager.Users.Include(u => u.Address).FirstAsync(u => u.Id == userId);
         return Result<AddressResponse>.Success(user.Address.Adapt<AddressResponse>());
 
     }
@@ -21,7 +17,7 @@ public static class UserManagerExtension
         if (string.IsNullOrEmpty(userId))
             return null;
 
-        var user = await userManager.Users
+        ApplicationUser? user = await userManager.Users
             .Include(u => u.Address)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 

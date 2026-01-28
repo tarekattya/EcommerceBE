@@ -39,7 +39,7 @@
             await _dbContext.SaveChangesAsync(cancellationToken);
 
 
-            var response = new AuthResponse(user.Id, user.Email, user.DisplayName, user.UserName, Token, expiresIn, RefreshToken.Token, refreshTokenExpiration);
+            var response = new AuthResponse(user.Id, user.Email, user.DisplayName, user.UserName ?? string.Empty, Token, expiresIn, RefreshToken.Token, refreshTokenExpiration);
             return Result<AuthResponse>.Success(response);
 
         }
@@ -78,7 +78,7 @@
                 user.Id,
                 user.Email,
                 user.DisplayName,
-                user.UserName,
+                user.UserName ?? string.Empty,
                 newToken,
                 expiresIn,
                 newRefreshToken.Token,

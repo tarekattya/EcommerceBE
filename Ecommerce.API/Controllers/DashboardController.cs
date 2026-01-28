@@ -5,9 +5,10 @@ public class DashboardController(IDashboardService dashboardService) : ApiBaseCo
     private readonly IDashboardService _dashboardService = dashboardService;
 
     [HttpGet("stats")]
+    [Cached(30)] // Cache dashboard stats for 30 seconds to improve performance
     public async Task<IActionResult> GetDashboardStats()
     {
-        var result = await _dashboardService.GetDashboardStatsAsync();
+        Result<DashboardDto>? result = await _dashboardService.GetDashboardStatsAsync();
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 }

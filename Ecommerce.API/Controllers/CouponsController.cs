@@ -19,7 +19,7 @@ public class CouponsController(ICouponService service) : ApiBaseController
     }
 
     [HttpPost]
-    [Authorize] 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<CouponResponse>> Create(CouponRequest request)
     {
         Result<CouponResponse>? result = await _service.CreateCouponAsync(request);
@@ -27,7 +27,7 @@ public class CouponsController(ICouponService service) : ApiBaseController
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _service.DeleteCouponAsync(id);

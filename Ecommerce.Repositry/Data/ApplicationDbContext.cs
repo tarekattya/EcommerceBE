@@ -93,6 +93,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ProductBrand> ProductBrands { get; set; } = default!;
     public DbSet<ProductCategory> ProductCategories { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
+    public DbSet<ProductVariant> ProductVariants { get; set; } = default!;
     public DbSet<Core.Order> Orders { get; set; } = default!;
     public DbSet<OrderItem> OrderItems { get; set; } = default!;
     public DbSet<DeliveryMethod> DeliveryMethods { get; set; } = default!;
@@ -100,7 +101,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Coupon> Coupons { get; set; } = default!;
     public DbSet<WishlistItem> WishlistItems { get; set; } = default!;
     public DbSet<ProductRating> ProductRatings { get; set; } = default!;
-
-
-
+    public DbSet<SavedAddress> SavedAddresses { get; set; } = default!;
 }

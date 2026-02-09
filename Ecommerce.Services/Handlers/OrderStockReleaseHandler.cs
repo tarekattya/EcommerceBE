@@ -8,14 +8,16 @@ public class OrderStockReleaseHandler(IUnitOfWork unitOfWork) : IDomainEventHand
     {
         foreach (var item in domainEvent.Items)
         {
-            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(item.ProductItemOrderd.ProductId);
-            if (product != null)
+            if (!item.ProductItemOrderd.ProductVariantId.HasValue)
+                continue;
+
+            var variant = await _unitOfWork.Repository<ProductVariant>()
+                .GetByIdAsync(item.ProductItemOrderd.ProductVariantId.Value);
+            if (variant != null)
             {
-                Result? result = product.Restock(item.Quantity);
+                var result = variant.Restock(item.Quantity);
                 if (result.IsSuccess)
-                {
-                    _unitOfWork.Repository<Product>().Update(product);
-                }
+                    _unitOfWork.Repository<ProductVariant>().Update(variant);
             }
         }
     }

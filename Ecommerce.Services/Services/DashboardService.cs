@@ -1,3 +1,5 @@
+using Ecommerce.Shared.Dtos;
+
 namespace Ecommerce.Application;
 
 public class DashboardService(IUnitOfWork unitOfWork, ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IOptions<BaseUrl> baseUrlOptions) : IDashboardService
@@ -135,6 +137,39 @@ public class DashboardService(IUnitOfWork unitOfWork, ApplicationDbContext dbCon
             p.QuantitySold,
             p.Revenue
         )).ToList();
+    }
+
+    public async Task<Result<SalesReportDto>> GetSalesReportAsync(DateTimeOffset from, DateTimeOffset to)
+    {
+        if (from > to)
+            return Result<SalesReportDto>.Failure(new Error("InvalidRange", "From date must be before To date.", 400));
+
+        var ordersInRange = _dbContext.Orders
+            .Where(o => !o.IsDeleted && o.OrderDate >= from && o.OrderDate <= to);
+
+        var orderCountTask = ordersInRange.CountAsync(o => o.Status != OrderStatus.Cancelled && o.Status != OrderStatus.PaymentFailed);
+        var revenueTask = ordersInRange
+            .Where(o => o.Status != OrderStatus.Cancelled && o.Status != OrderStatus.PaymentFailed)
+            .SumAsync(o => (decimal?)o.SubTotal);
+        var cancelledCountTask = ordersInRange.CountAsync(o => o.Status == OrderStatus.Cancelled);
+
+        await Task.WhenAll(orderCountTask, revenueTask, cancelledCountTask);
+
+        int orderCount = await orderCountTask;
+        decimal revenue = await revenueTask ?? 0m;
+        int cancelledCount = await cancelledCountTask;
+
+        return Result<SalesReportDto>.Success(new SalesReportDto(from, to, orderCount, revenue, cancelledCount));
+    }
+
+    public async Task<Result<Pagination<OrderResponse>>> GetOrdersReportAsync(OrderSpecParams specParams)
+    {
+        var orderRepo = _unitOfWork.Repository<Order>();
+        var list = await orderRepo.GetAllWithSpecAsync(new AdminOrdersReportSpec(specParams));
+        var total = await orderRepo.GetCountAsync(new AdminOrdersReportCountSpec(specParams));
+        var data = list.Adapt<IReadOnlyList<OrderResponse>>();
+        return Result<Pagination<OrderResponse>>.Success(
+            new Pagination<OrderResponse>(specParams.PageIndex, specParams.PageSize, total, data));
     }
 
     private string MapPictureUrl(string? pictureUrl)

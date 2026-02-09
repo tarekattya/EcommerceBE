@@ -1,4 +1,4 @@
-﻿using Ecommerce.Shared;
+using Ecommerce.Shared;
 
 namespace Ecommerce.API;
 public class BrandsController(IBrandService service) : ApiBaseController
@@ -20,14 +20,14 @@ public class BrandsController(IBrandService service) : ApiBaseController
         var brand = await _service.GetBrandById(id);
         return brand.IsSuccess ? Ok(brand.Value) : brand.ToProblem();
     }
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost("")]
     public async Task<ActionResult<BrandResponse>> CreateBrand([FromBody] BrandRequest request)
     {
         var brand = await _service.CreateBrand(request);
         return brand.IsSuccess ? Ok(brand.Value) : brand.ToProblem();
     }
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateBrand([FromRoute] int id, [FromBody] BrandRequest request)
     {
@@ -35,6 +35,7 @@ public class BrandsController(IBrandService service) : ApiBaseController
         return brand.IsSuccess ? NoContent() : brand.ToProblem();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteBrand([FromRoute] int id)
     {

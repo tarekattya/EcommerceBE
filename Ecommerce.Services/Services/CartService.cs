@@ -1,9 +1,10 @@
-﻿namespace Ecommerce.Application;
+namespace Ecommerce.Application;
 
-public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork) : ICartService
+public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork, IOptions<BaseUrl> baseUrlOptions) : ICartService
 {
     private readonly ICartRepository _cartRepository = cartRepository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly string _baseUrl = baseUrlOptions.Value.BaseURL;
 
     public async Task<Result<CartResponse>> CreateCartAsync(CartRequest cartRequest)
     {
@@ -23,23 +24,16 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
             Items = new List<CartItem>()
         };
 
-        List<int>? productIds = cartRequest.Items.Select(i => i.Id).ToList();
-        IReadOnlyList<Product>? products = await _unitOfWork.Repository<Product>()
-            .GetAllWithSpecAsync(new ProductsByIdsSpec(productIds));
-
         foreach (CartItemsRequest itemRequest in cartRequest.Items)
         {
-            Product? product = products.FirstOrDefault(p => p.Id == itemRequest.Id);
-            if (product is null)
+            CartItem? cartItem = await ResolveCartItemAsync(itemRequest.VariantId, itemRequest.ProductId, itemRequest.Quantity);
+            if (cartItem is null)
                 return Result<CartResponse>.Failure(ProductErrors.NotFoundProduct);
-
-            CartItem? cartItem = product.Adapt<CartItem>();
-            cartItem.Quantity = itemRequest.Quantity;
             cart.Items.Add(cartItem);
         }
 
         cart.Items = cart.Items
-            .GroupBy(i => i.Id)
+            .GroupBy(i => i.VariantId)
             .Select(g =>
             {
                 var first = g.First();
@@ -68,32 +62,23 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
         if (cartRequest.Items is null || !cartRequest.Items.Any())
             return Result<CartResponse>.Failure(CartErrors.EmptyCart);
 
-        var existingItemIds = cart.Items.Select(i => i.Id).ToList();
-        var requestItemIds = cartRequest.Items.Select(i => i.Id).ToList();
-        var intersectIds = existingItemIds.Intersect(requestItemIds).ToList();
-
-        if (!intersectIds.Any())
-            return Result<CartResponse>.Failure(CartErrors.InvalidItemsIds);
-
-        var products = await _unitOfWork.Repository<Product>()
-            .GetAllWithSpecAsync(new ProductsByIdsSpec(intersectIds));
-
         foreach (var item in cartRequest.Items)
         {
-            var existingItem = cart.Items.FirstOrDefault(i => i.Id == item.Id);
+            var existingItem = cart.Items.FirstOrDefault(i => i.VariantId == item.VariantId);
             if (existingItem is null)
-                continue; 
+                continue;
 
-            var product = products.FirstOrDefault(p => p.Id == item.Id);
-            if (product is null)
+            CartItem? resolved = await ResolveCartItemAsync(item.VariantId, item.ProductId, item.Quantity);
+            if (resolved is null)
                 return Result<CartResponse>.Failure(ProductErrors.NotFoundProduct);
-
             existingItem.Quantity = item.Quantity;
-            existingItem.Price = product.Price;
-            existingItem.ProductName = product.Name;
-            existingItem.Brand = product.Brand.Name;
-            existingItem.Type = product.Category.Name;
-            existingItem.PictureUrl = product.PictureUrl;
+            existingItem.Price = resolved.Price;
+            existingItem.ProductName = resolved.ProductName;
+            existingItem.Brand = resolved.Brand;
+            existingItem.Type = resolved.Type;
+            existingItem.PictureUrl = resolved.PictureUrl;
+            existingItem.Size = resolved.Size;
+            existingItem.Color = resolved.Color;
         }
 
         var updatedCart = await _cartRepository.UpdateCartAsync(cart);
@@ -116,23 +101,22 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
         if (string.IsNullOrWhiteSpace(request.CartId))
             return Result<CartResponse>.Failure(CartErrors.InvalidCartId);
 
-        if (request.ItemIds == null || !request.ItemIds.Any())
+        if (request.VariantIds == null || !request.VariantIds.Any())
             return Result<CartResponse>.Failure(CartErrors.EmptyCart);
 
         var existingCart = await _cartRepository.GetCartAsync(request.CartId);
         if (existingCart is null)
             return Result<CartResponse>.Failure(CartErrors.NotFoundCart);
 
-        var notFoundItems = request.ItemIds
-        .Where(id => !existingCart.Items.Any(i => i.Id == id))
-        .ToList();
-
-        if (notFoundItems.Any())
-        {
+        var keys = request.VariantIds.ToHashSet();
+        var notFound = request.VariantIds
+            .Where(vId => !existingCart.Items.Any(i => i.VariantId == vId))
+            .ToList();
+        if (notFound.Any())
             return Result<CartResponse>.Failure(CartErrors.InvalidItemsIds);
-        }
+
         existingCart.Items = existingCart.Items
-            .Where(i => !request.ItemIds.Contains(i.Id))
+            .Where(i => !keys.Contains(i.VariantId))
             .ToList();
 
         var updatedCart = await _cartRepository.UpdateCartAsync(existingCart);
@@ -154,32 +138,17 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
         if (cart == null)
             return Result<CartResponse>.Failure(CartErrors.NotFoundCart);
 
-        var productIds = request.Items.Select(x => x.Id).ToList();
-        var products = await _unitOfWork.Repository<Product>()
-            .GetAllWithSpecAsync(new ProductsByIdsSpec(productIds));
-
         foreach (var itemRequest in request.Items)
         {
-            var product = products.FirstOrDefault(p => p.Id == itemRequest.Id);
-            if (product == null)
+            CartItem? resolved = await ResolveCartItemAsync(itemRequest.VariantId, itemRequest.ProductId, itemRequest.Quantity);
+            if (resolved == null)
                 return Result<CartResponse>.Failure(ProductErrors.NotFoundProduct);
 
-            var existingItem = cart.Items.FirstOrDefault(i => i.Id == itemRequest.Id);
+            var existingItem = cart.Items.FirstOrDefault(i => i.VariantId == itemRequest.VariantId);
             if (existingItem != null)
-            {
                 existingItem.Quantity += itemRequest.Quantity;
-            }
             else
-            {
-                var newItem = itemRequest.Adapt<CartItem>();
-                newItem.ProductName = product.Name;
-                newItem.Price = product.Price;
-                newItem.Brand = product.Brand.Name;
-                newItem.Type = product.Category.Name;
-                newItem.PictureUrl = product.PictureUrl;
-
-                cart.Items.Add(newItem);
-            }
+                cart.Items.Add(resolved);
         }
 
         var updatedCart = await _cartRepository.UpdateCartAsync(cart);
@@ -195,4 +164,30 @@ public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork)
         return result ? Result.Success() : Result.Failure(CartErrors.NotFoundCart);
     }
 
+    private async Task<CartItem?> ResolveCartItemAsync(int variantId, int productId, int quantity)
+    {
+        var variant = await _unitOfWork.Repository<ProductVariant>()
+            .GetByIdWithSpecAsync(new ProductVariantByIdWithProductSpec(variantId));
+        if (variant == null || variant.ProductId != productId) return null;
+
+        var product = variant.Product;
+        string pictureUrl = string.IsNullOrEmpty(product.PictureUrl)
+            ? ""
+            : $"{_baseUrl}/{product.PictureUrl.TrimStart('/')}";
+
+        return new CartItem
+        {
+            VariantId = variant.Id,
+            ProductId = product.Id,
+            Size = variant.Size,
+            Color = variant.Color,
+            Quantity = quantity,
+            Price = variant.Price,
+            ProductName = product.Name,
+            Brand = product.Brand?.Name ?? "",
+            Type = product.Category?.Name ?? "",
+            PictureUrl = pictureUrl,
+            Description = product.Description ?? ""
+        };
+    }
 }

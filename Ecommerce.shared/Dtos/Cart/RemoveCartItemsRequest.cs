@@ -1,5 +1,6 @@
-﻿namespace Ecommerce.Shared;
+namespace Ecommerce.Shared;
 
-public record RemoveCartItemsRequest(string CartId, List<int> ItemIds);
+/// <summary>Identifies a cart line by variant.</summary>
+public record RemoveCartItemsRequest(string CartId, List<int> VariantIds);
 
 

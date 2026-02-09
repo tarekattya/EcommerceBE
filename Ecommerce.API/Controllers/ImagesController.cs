@@ -4,6 +4,7 @@ public class ImagesController(IFileService fileService) : ApiBaseController
 {
     private readonly IFileService _fileService = fileService;
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("upload")]
     public async Task<ActionResult<string>> UploadImage(IFormFile file, [FromQuery] string folder = "products")
     {
@@ -27,6 +28,7 @@ public class ImagesController(IFileService fileService) : ApiBaseController
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("delete")]
     public IActionResult DeleteImage([FromQuery] string path)
     {

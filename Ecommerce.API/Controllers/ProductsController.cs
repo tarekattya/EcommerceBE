@@ -1,4 +1,4 @@
-﻿
+
 using Ecommerce.Shared;
 
 namespace Ecommerce.API;
@@ -23,6 +23,7 @@ public class ProductsController(IProductService service) : ApiBaseController
         return product.IsSuccess ? Ok(product.Value) : product.ToProblem();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("")]
     public async Task<ActionResult<productResponse>> CreateProduct([FromForm] ProductRequest request, IFormFile? image)
     {
@@ -30,6 +31,7 @@ public class ProductsController(IProductService service) : ApiBaseController
         return product.IsSuccess ? Ok(product.Value) : product.ToProblem();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<productResponse>> UpdateProduct([FromRoute] int id, [FromForm] ProductRequest request, IFormFile? image)
     {
@@ -37,6 +39,7 @@ public class ProductsController(IProductService service) : ApiBaseController
         return product.IsSuccess ? NoContent() : product.ToProblem();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProduct([FromRoute] int id)
     {

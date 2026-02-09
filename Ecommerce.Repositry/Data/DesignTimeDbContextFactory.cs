@@ -1,10 +1,10 @@
-﻿public class ApplicationDbContextFactory
+public class ApplicationDbContextFactory
     : IDesignTimeDbContextFactory<ApplicationDbContext>
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlite("Data Source=Ecommerce.db")
+            .UseSqlServer("Server=.;Database=Ecommerce;Trusted_Connection=True;TrustServerCertificate=True;")
             .Options;
 
         return new ApplicationDbContext(

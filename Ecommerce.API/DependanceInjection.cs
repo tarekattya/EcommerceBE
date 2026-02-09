@@ -2,6 +2,8 @@ using Newtonsoft.Json.Converters;
 using Ecommerce.Core;
 using Ecommerce.Services;
 using Ecommerce.Application;
+using Hangfire;
+using Hangfire.SqlServer;
 
 namespace Ecommerce.API;
 
@@ -37,16 +39,50 @@ public static class DependanceInjection
 
 
         services.AddDBServices(configuration);
+
+        // Health checks (for load balancers, containers, monitoring)
+        services.AddHealthChecks()
+            .AddDbContextCheck<ApplicationDbContext>("database", tags: new[] { "ready" })
+            .AddRedis(configuration.GetConnectionString("RedisConnection")!, "redis", tags: new[] { "ready" });
+
+        var hangfireConnection = configuration.GetConnectionString("HangfireConnection");
+        if (string.IsNullOrWhiteSpace(hangfireConnection))
+            hangfireConnection = configuration.GetConnectionString("Data");
+
+        if (!string.IsNullOrWhiteSpace(hangfireConnection))
+        {
+            var storageOptions = new SqlServerStorageOptions
+            {
+                PrepareSchemaIfNecessary = true,
+                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5)
+            };
+            services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(hangfireConnection, storageOptions));
+
+            services.AddHangfireServer();
+        }
+        
+        // Hangfire job classes (resolved by Hangfire when running jobs)
+        services.AddScoped<DailyCleanupJob>();
+        
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IProductVariantService, ProductVariantService>();
         services.AddScoped<IBrandService, BrandService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IDashboardService, DashboardService>();
-        services.AddScoped<IEmailService, EmailService>();
+        
+        // Email services - Hangfire is the only background engine
+        services.AddScoped<EmailService>();                 // Direct SMTP sender
+        services.AddScoped<IEmailService, HangfireEmailService>(); // IEmailService implementation that enqueues Hangfire jobs
+        
         services.AddSingleton<ICacheService, CacheService>();
         services.AddScoped<ICouponService, CouponService>();
         services.AddScoped<IWishlistService, WishlistService>();
@@ -55,7 +91,15 @@ public static class DependanceInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IDomainEventHandler<OrderStockReleaseEvent>, OrderStockReleaseHandler>();
         services.AddScoped<IDomainEventHandler<OrderProcessingStartedEvent>, OrderProcessingStartedHandler>();
+        services.AddScoped<IDomainEventHandler<OrderCreatedEvent>, OrderCreatedEmailHandler>();
+        services.AddScoped<IDomainEventHandler<OrderPaymentSucceededEvent>, OrderPaymentSucceededInvoiceHandler>();
+        services.AddScoped<IDomainEventHandler<OrderProcessingStartedEvent>, OrderProcessingStartedInvoiceHandler>();
+        services.AddScoped<IDomainEventHandler<OrderCancelledEvent>, OrderCancelledEmailHandler>();
+        services.AddScoped<IDomainEventHandler<OrderShippedEvent>, OrderShippedEmailHandler>();
+        services.AddScoped<IDomainEventHandler<OrderDeliveredEvent>, OrderDeliveredEmailHandler>();
         services.AddScoped<IFileService, FileService>();
+        services.AddScoped<ISavedAddressService, SavedAddressService>();
+        services.AddHttpClient();
 
         return services;
     }
@@ -65,7 +109,7 @@ public static class DependanceInjection
         services.AddDbContext<ApplicationDbContext>(
             options =>
             {
-                options/*.UseLazyLoadingProxies()*/.UseSqlite(configuration.GetConnectionString("Data"));
+                options/*.UseLazyLoadingProxies()*/.UseSqlServer(configuration.GetConnectionString("Data"));
             });
 
         services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -110,6 +154,11 @@ public static class DependanceInjection
         services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+        });
 
         services.AddAuthentication(options =>
         {

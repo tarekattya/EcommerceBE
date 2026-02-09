@@ -139,49 +139,39 @@ public static class ApplicationDbSeeding
         // Seed Coupons
         if (dbContext.Coupons.Count() == 0)
         {
-            // Use raw SQL to insert coupons to bypass RowVersion generation issue in SQLite
+            // Use raw SQL to insert coupons (positional parameters work with SQL Server)
             var rowVersion = new byte[8];
             var createdAt = DateTime.UtcNow;
             
             // WELCOME10
             await dbContext.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO Coupons (Code, DiscountValue, DiscountType, ExpiryDate, MinimumAmount, UsageLimit, UsageCount, IsActive, CreatedAt, IsDeleted, RowVersion)
-                  VALUES ('WELCOME10', 10, 0, @expiry1, 50, 100, 0, 1, @created, 0, @rowVersion)",
-                new Microsoft.Data.Sqlite.SqliteParameter("@expiry1", DateTime.UtcNow.AddMonths(3)),
-                new Microsoft.Data.Sqlite.SqliteParameter("@created", createdAt),
-                new Microsoft.Data.Sqlite.SqliteParameter("@rowVersion", rowVersion));
+                  VALUES ('WELCOME10', 10, 0, {0}, 50, 100, 0, 1, {1}, 0, {2})",
+                DateTime.UtcNow.AddMonths(3), createdAt, rowVersion);
             
             // SAVE20
             await dbContext.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO Coupons (Code, DiscountValue, DiscountType, ExpiryDate, MinimumAmount, UsageLimit, UsageCount, IsActive, CreatedAt, IsDeleted, RowVersion)
-                  VALUES ('SAVE20', 20, 0, @expiry2, 100, 50, 0, 1, @created, 0, @rowVersion)",
-                new Microsoft.Data.Sqlite.SqliteParameter("@expiry2", DateTime.UtcNow.AddMonths(6)),
-                new Microsoft.Data.Sqlite.SqliteParameter("@created", createdAt),
-                new Microsoft.Data.Sqlite.SqliteParameter("@rowVersion", rowVersion));
+                  VALUES ('SAVE20', 20, 0, {0}, 100, 50, 0, 1, {1}, 0, {2})",
+                DateTime.UtcNow.AddMonths(6), createdAt, rowVersion);
             
             // FIXED50
             await dbContext.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO Coupons (Code, DiscountValue, DiscountType, ExpiryDate, MinimumAmount, UsageLimit, UsageCount, IsActive, CreatedAt, IsDeleted, RowVersion)
-                  VALUES ('FIXED50', 50, 1, @expiry3, 200, NULL, 0, 1, @created, 0, @rowVersion)",
-                new Microsoft.Data.Sqlite.SqliteParameter("@expiry3", DateTime.UtcNow.AddMonths(2)),
-                new Microsoft.Data.Sqlite.SqliteParameter("@created", createdAt),
-                new Microsoft.Data.Sqlite.SqliteParameter("@rowVersion", rowVersion));
+                  VALUES ('FIXED50', 50, 1, {0}, 200, NULL, 0, 1, {1}, 0, {2})",
+                DateTime.UtcNow.AddMonths(2), createdAt, rowVersion);
             
             // FREESHIP
             await dbContext.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO Coupons (Code, DiscountValue, DiscountType, ExpiryDate, MinimumAmount, UsageLimit, UsageCount, IsActive, CreatedAt, IsDeleted, RowVersion)
-                  VALUES ('FREESHIP', 0, 2, @expiry4, 50, 200, 0, 1, @created, 0, @rowVersion)",
-                new Microsoft.Data.Sqlite.SqliteParameter("@expiry4", DateTime.UtcNow.AddMonths(1)),
-                new Microsoft.Data.Sqlite.SqliteParameter("@created", createdAt),
-                new Microsoft.Data.Sqlite.SqliteParameter("@rowVersion", rowVersion));
+                  VALUES ('FREESHIP', 0, 2, {0}, 50, 200, 0, 1, {1}, 0, {2})",
+                DateTime.UtcNow.AddMonths(1), createdAt, rowVersion);
             
             // BOGO50
             await dbContext.Database.ExecuteSqlRawAsync(
                 @"INSERT INTO Coupons (Code, DiscountValue, DiscountType, ExpiryDate, MinimumAmount, UsageLimit, UsageCount, IsActive, CreatedAt, IsDeleted, RowVersion)
-                  VALUES ('BOGO50', 50, 3, @expiry5, NULL, 30, 0, 1, @created, 0, @rowVersion)",
-                new Microsoft.Data.Sqlite.SqliteParameter("@expiry5", DateTime.UtcNow.AddMonths(4)),
-                new Microsoft.Data.Sqlite.SqliteParameter("@created", createdAt),
-                new Microsoft.Data.Sqlite.SqliteParameter("@rowVersion", rowVersion));
+                  VALUES ('BOGO50', 50, 3, {0}, NULL, 30, 0, 1, {1}, 0, {2})",
+                DateTime.UtcNow.AddMonths(4), createdAt, rowVersion);
         }
 
         // Seed Orders - Generate 1000 orders with various statuses

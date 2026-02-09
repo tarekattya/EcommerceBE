@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Ecommerce.Shared;
-using FluentValidation.Validators;
-
-namespace Ecommerce.Application;
-
+﻿namespace Ecommerce.Application;
 public class OrderResponseValidator : AbstractValidator<OrderResponse>
 {
     const int minValue = 0;
-    const int maxStatusValue = 0;
     public OrderResponseValidator()
     {
         RuleFor(x => x.Id).GreaterThan(minValue);

@@ -1,4 +1,4 @@
-﻿
+
 namespace Ecommerce.Application;
 
 public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository, ICouponService couponService) : IOrderService
@@ -15,11 +15,11 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
             return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
         return Result<OrderResponse>.Success(order.Adapt<OrderResponse>());
     }
-    public async Task<Result> CancelOrderAsync(int orderId)
+    public async Task<Result> CancelOrderAsync(int orderId, string? buyerEmail = null)
     {
-        OrderSpecification orderSpecification = new OrderSpecification(orderId);
+        OrderSpecification orderSpecification = new OrderSpecification(orderId, buyerEmail);
         Order? order = await _unitOfWork.Repository<Order>().GetByIdWithSpecAsync(orderSpecification);
-        
+
         if (order is null)
             return Result.Failure(OrderErrors.NotFoundOrder);
 
@@ -47,23 +47,25 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
 
         foreach (CartItem cartItem in cart.Items)
         {
-            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(cartItem.Id);
-
-            if (product is null)
+            var variant = await _unitOfWork.Repository<ProductVariant>().GetByIdAsync(cartItem.VariantId);
+            if (variant is null || variant.ProductId != cartItem.ProductId)
                 return Result<OrderResponse>.Failure(ProductErrors.NotFoundProduct);
 
-            if (cartItem.Quantity > product.Stock)
+            if (cartItem.Quantity > variant.Stock)
                 return Result<OrderResponse>.Failure(ProductErrors.TheQuantityNotEnough);
         }
+
         List<OrderItem>? items = cart.Items.Select(item => new OrderItem
         {
             ProductItemOrderd = new ProductItemOrderd
             {
-                ProductId = item.Id,
+                ProductId = item.ProductId,
+                ProductVariantId = item.VariantId,
+                Size = item.Size,
+                Color = item.Color,
                 Name = item.ProductName,
                 PictureUrl = item.PictureUrl,
-                Description =item.Description
-
+                Description = item.Description ?? string.Empty
             },
             Price = item.Price,
             Quantity = item.Quantity
@@ -104,6 +106,7 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
             discount
         );
 
+        newOrder.AddDomainEvent(new OrderCreatedEvent(newOrder));
         await _unitOfWork.Repository<Order>().AddAsync(newOrder);
 
         await _unitOfWork.CompleteAsync();
@@ -135,14 +138,16 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
         
         if (order is null)
             return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
-        if (!Enum.TryParse<OrderStatus>(request.Status, true, out OrderStatus statusEnum))
-        {
+
+        if (!TryParseOrderStatus(request.Status, out OrderStatus statusEnum))
             return Result<OrderResponse>.Failure(OrderErrors.InvalidStatus);
-        }
 
         Result? result = order.UpdateStatus(statusEnum);
         if (!result.IsSuccess) 
             return Result<OrderResponse>.Failure(OrderErrors.InvalidStatusUpdate);
+
+        if (statusEnum == OrderStatus.Shipped && !string.IsNullOrWhiteSpace(request.TrackingNumber))
+            order.SetTrackingNumber(request.TrackingNumber!);
 
         _unitOfWork.Repository<Order>().Update(order);
         await _unitOfWork.CompleteAsync();
@@ -150,5 +155,51 @@ public class OrderService(IUnitOfWork unitOfWork, ICartRepository cartRepository
         return Result<OrderResponse>.Success(order.Adapt<OrderResponse>());
     }
 
+    public async Task<Result<OrderResponse>> GetOrderByTrackingNumberAsync(string trackingNumber)
+    {
+        if (string.IsNullOrWhiteSpace(trackingNumber))
+            return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
+        var spec = new OrderByTrackingNumberSpec(trackingNumber);
+        Order? order = await _unitOfWork.Repository<Order>().GetByIdWithSpecAsync(spec);
+        if (order is null)
+            return Result<OrderResponse>.Failure(OrderErrors.NotFoundOrder);
+        return Result<OrderResponse>.Success(order.Adapt<OrderResponse>());
+    }
 
+    public async Task<Result<InvoiceDto>> GetInvoiceAsync(int orderId, string? buyerEmail = null)
+    {
+        var spec = new OrderSpecification(orderId, buyerEmail);
+        Order? order = await _unitOfWork.Repository<Order>().GetByIdWithSpecAsync(spec);
+        if (order is null)
+            return Result<InvoiceDto>.Failure(OrderErrors.NotFoundOrder);
+
+        var deliveryCost = order.DeliveryMethod?.Cost ?? 0m;
+        var invoice = new InvoiceDto(
+            InvoiceNumber: $"INV-{order.Id}",
+            OrderId: order.Id,
+            BuyerEmail: order.BuyerEmail,
+            OrderDate: order.OrderDate,
+            Status: order.Status.ToString(),
+            ShippingAddress: order.ShipingAddress.Adapt<OrderAddressRequest>(),
+            DeliveryMethodName: order.DeliveryMethod?.ShortName ?? "",
+            Items: order.Items.Adapt<IReadOnlyList<OrderItemResponse>>(),
+            SubTotal: order.SubTotal,
+            DeliveryCost: deliveryCost,
+            Discount: order.Discount,
+            Total: order.GetTotal(),
+            CouponCode: order.CouponCode,
+            TrackingNumber: order.TrackingNumber
+        );
+        return Result<InvoiceDto>.Success(invoice);
+    }
+
+    /// <summary>Parse status from request (accepts enum name or display value e.g. "Payment Succeeded").</summary>
+    private static bool TryParseOrderStatus(string? value, out OrderStatus status)
+    {
+        status = default;
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        if (Enum.TryParse<OrderStatus>(value, true, out status)) return true;
+        var normalized = value.Trim().Replace(" ", "");
+        return Enum.TryParse<OrderStatus>(normalized, true, out status);
+    }
 }

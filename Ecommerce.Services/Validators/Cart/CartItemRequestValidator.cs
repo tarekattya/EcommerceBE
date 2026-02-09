@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Application;
+namespace Ecommerce.Application;
 
 public class CartItemRequestValidator : AbstractValidator<CartItemsRequest>
 {
@@ -7,6 +7,7 @@ public class CartItemRequestValidator : AbstractValidator<CartItemsRequest>
     public CartItemRequestValidator()
     {
         RuleFor(x => x.Quantity).GreaterThan(minValue).LessThan(maxValue).WithMessage($"Quantity must be greater than {minValue} and less than {maxValue}");
-        RuleFor(x => x.Id).NotNull();
+        RuleFor(x => x.VariantId).GreaterThan(0);
+        RuleFor(x => x.ProductId).GreaterThan(0);
     }
 }

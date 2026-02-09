@@ -1,4 +1,4 @@
-﻿using Ecommerce.Core;
+using Ecommerce.Core;
 
 namespace Ecommerce.API;
 public class CategoriesController(ICategoryService service) : ApiBaseController
@@ -20,6 +20,7 @@ public class CategoriesController(ICategoryService service) : ApiBaseController
         return category.IsSuccess ? Ok(category.Value) : category.ToProblem();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("")]
     public async Task<ActionResult> CreateCategory([FromQuery] CategoryRequest request)
     {
@@ -27,6 +28,7 @@ public class CategoriesController(ICategoryService service) : ApiBaseController
         return category.IsSuccess ? Ok(category.Value) : category.ToProblem();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateCategory(int id, [FromQuery] CategoryRequest request)
     {
@@ -34,6 +36,7 @@ public class CategoriesController(ICategoryService service) : ApiBaseController
         return category.IsSuccess ? NoContent() : category.ToProblem();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteCategory(int id)
     {

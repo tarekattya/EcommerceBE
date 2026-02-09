@@ -8,14 +8,17 @@ public class OrderProcessingStartedHandler(IUnitOfWork unitOfWork) : IDomainEven
     {
         foreach (OrderItem item in domainEvent.Order.Items)
         {
-            Product? product = await _unitOfWork.Repository<Product>().GetByIdAsync(item.ProductItemOrderd.ProductId);
-            if (product != null)
+            // In the new model every order item must have a variant
+            if (!item.ProductItemOrderd.ProductVariantId.HasValue)
+                continue;
+
+            var variant = await _unitOfWork.Repository<ProductVariant>()
+                .GetByIdAsync(item.ProductItemOrderd.ProductVariantId.Value);
+            if (variant != null)
             {
-                Result? result = product.ReduceStock(item.Quantity);
+                var result = variant.ReduceStock(item.Quantity);
                 if (result.IsSuccess)
-                {
-                    _unitOfWork.Repository<Product>().Update(product);
-                }
+                    _unitOfWork.Repository<ProductVariant>().Update(variant);
             }
         }
     }

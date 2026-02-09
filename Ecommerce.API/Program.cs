@@ -1,3 +1,7 @@
+using Hangfire;
+using Hangfire.Dashboard;
+using Ecommerce.Services;
+
 namespace Ecommerce.API;
 
 public class Program
@@ -11,6 +15,12 @@ public class Program
         WebApplication? app = builder.Build();
 
         await DbInitializer.InitializeAsync(app);
+        
+        using (var scope = app.Services.CreateScope())
+        {
+            var recurringJobManager = scope.ServiceProvider.GetRequiredService<Hangfire.IRecurringJobManager>();
+            RecurringJobs.RegisterRecurringJobs(recurringJobManager);
+        }
 
 
         app.UseExceptionMiddleware();
@@ -33,9 +43,23 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireAuthorizationFilter() },
+                DashboardTitle = "Ecommerce Background Jobs"
+            });
+        }
+        
         app.UseStatusCodePagesWithReExecute("/Errors/{0}");
-        app.UseStaticFiles();
+        app.UseStaticFiles();   
 
+        app.MapHealthChecks("/health");
+        app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("ready")
+        });
         app.MapControllers();
 
         app.Run();

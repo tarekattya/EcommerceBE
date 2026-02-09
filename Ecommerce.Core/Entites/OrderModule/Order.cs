@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Core;
+namespace Ecommerce.Core;
 public class Order : BaseEntity
 {
     public Order(string buyerEmail, OrderAddress shipingAddress, DeliveryMethod deliveryMethod, ICollection<OrderItem> items, decimal subTotal, bool isCOD = false, string? couponCode = null, decimal discount = 0)
@@ -37,6 +37,8 @@ public class Order : BaseEntity
 
     public bool InventoryReserved { get; private set; }
 
+    public string? TrackingNumber { get; private set; }
+
     public Result UpdateStatus(OrderStatus newStatus)
     {
         bool isValid = Status switch
@@ -65,6 +67,7 @@ public class Order : BaseEntity
 
         Status = OrderStatus.Cancelled;
         ApplyStatusSideEffects();
+        AddDomainEvent(new OrderCancelledEvent(this));
         
         return Result.Success();
     }
@@ -88,6 +91,10 @@ public class Order : BaseEntity
                 InventoryReserved = true;
                 break;
 
+            case OrderStatus.PaymentSucceeded:
+                AddDomainEvent(new OrderPaymentSucceededEvent(this));
+                break;
+
             case OrderStatus.Processing:
                 AddDomainEvent(new OrderProcessingStartedEvent(this));
                 InventoryReserved = true;
@@ -106,4 +113,8 @@ public class Order : BaseEntity
     public decimal GetTotal() =>
         SubTotal + DeliveryMethod.Cost - Discount;
 
+    public void SetTrackingNumber(string trackingNumber)
+    {
+        TrackingNumber = trackingNumber?.Trim();
+    }
 }

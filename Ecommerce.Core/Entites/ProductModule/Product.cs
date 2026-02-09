@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Core;
+namespace Ecommerce.Core;
 
 public class Product : BaseEntity
 {
@@ -24,6 +24,9 @@ public class Product : BaseEntity
     public int CategoryId { get; set; }
     public int Stock { get; private set; }
     public ProductCategory Category { get; set; } = default!;
+
+    /// <summary>When set, price/stock are taken from variants; otherwise use Product.Price and Product.Stock.</summary>
+    public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
 
     public Result ReduceStock(int quantity)
     {

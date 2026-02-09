@@ -1,3 +1,4 @@
 namespace Ecommerce.Shared;
-public record UpdateOrderStatusRequest(string Status);
+
+public record UpdateOrderStatusRequest(string Status, string? TrackingNumber = null);
 

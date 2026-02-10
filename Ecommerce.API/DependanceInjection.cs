@@ -4,6 +4,8 @@ using Ecommerce.Services;
 using Ecommerce.Application;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.OpenApi;
+using Ecommerce.API.Filters;
 
 namespace Ecommerce.API;
 
@@ -31,7 +33,23 @@ public static class DependanceInjection
             });
         services.AddOpenApi();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(c =>
+        {
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Description = "Enter: Bearer your_jwt_token_here (include the word Bearer and a space before the token)"
+            });
+            c.AddSecurityRequirement(document =>
+            {
+                var schemeRef = new OpenApiSecuritySchemeReference("Bearer");
+                var requirement = new OpenApiSecurityRequirement { [schemeRef] = [] };
+                return requirement;
+            });
+            c.DocumentFilter<SwaggerSecurityDocumentFilter>();
+        });
         services.AddMapping(configuration);
         services.AddValidtionResponse(webApplication);
         services.AddFluentValidation();
@@ -179,9 +197,9 @@ public static class DependanceInjection
                 ValidateIssuer = true,
                 ValidateLifetime = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!.Key)),
-
                 ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience
+                ValidAudience = jwtSettings.Audience,
+                ClockSkew = TimeSpan.FromMinutes(1)
             };
             
             o.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents

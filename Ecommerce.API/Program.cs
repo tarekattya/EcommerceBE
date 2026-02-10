@@ -34,11 +34,7 @@ public class Program
             });
         }
         app.UseHttpsRedirection();
-
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseCors("AllowSpecificOrigin");
-        }
+        app.UseCors("AllowSpecificOrigin");
 
         app.UseAuthentication();
         app.UseAuthorization();

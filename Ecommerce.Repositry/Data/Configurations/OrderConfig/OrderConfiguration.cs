@@ -10,7 +10,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Core.Order>
 
         builder.HasOne(e => e.DeliveryMethod)
             .WithMany()
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Performance: Add indexes on frequently queried columns
         builder.HasIndex(e => e.Status);

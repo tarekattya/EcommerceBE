@@ -88,6 +88,8 @@ public static class DependanceInjection
         services.AddScoped<IWishlistService, WishlistService>();
         services.AddScoped<IRatingService, RatingService>();
         services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
+        services.Configure<PaymobSettings>(configuration.GetSection(PaymobSettings.SectionName));
+        services.AddScoped<IPaymentService, PaymobPaymentService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IDomainEventHandler<OrderStockReleaseEvent>, OrderStockReleaseHandler>();
         services.AddScoped<IDomainEventHandler<OrderProcessingStartedEvent>, OrderProcessingStartedHandler>();

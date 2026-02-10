@@ -39,6 +39,10 @@ public class Order : BaseEntity
 
     public string? TrackingNumber { get; private set; }
 
+    public long? PaymobOrderId { get; private set; }
+
+    public void SetPaymobOrderId(long paymobOrderId) => PaymobOrderId = paymobOrderId;
+
     public Result UpdateStatus(OrderStatus newStatus)
     {
         bool isValid = Status switch
